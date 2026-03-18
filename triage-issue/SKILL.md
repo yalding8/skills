@@ -52,14 +52,15 @@ Rules:
 - One test at a time, vertical slices (NOT all tests first, then all code)
 - Each test should survive internal refactors
 - Include a final refactor step if needed
-- **Durability**: Only suggest fixes that would survive radical codebase changes. Describe behaviors and contracts, not internal structure. Tests assert on observable outcomes (API responses, UI state, user-visible effects), not internal state. A good suggestion reads like a spec; a bad one reads like a diff.
+- Only suggest fixes that would survive radical codebase changes
 
 ### 5. Create the GitHub issue
 
 Create a GitHub issue using `gh issue create` with the template below. Do NOT ask the user to review before creating - just create it and share the URL.
 
-<issue-template>
+Issue template:
 
+```
 ## Problem
 
 A clear description of the bug or issue, including:
@@ -74,7 +75,7 @@ Describe what you found during investigation:
 - Why the current code fails
 - Any contributing factors
 
-Do NOT include specific file paths, line numbers, or implementation details that couple to current code layout. Describe modules, behaviors, and contracts instead. The issue should remain useful even after major refactors.
+Do NOT include specific file paths, line numbers, or implementation details that couple to current code layout.
 
 ## TDD Fix Plan
 
@@ -86,8 +87,6 @@ A numbered list of RED-GREEN cycles:
 2. **RED**: Write a test that [describes next behavior]
    **GREEN**: [Minimal change to make it pass]
 
-...
-
 **REFACTOR**: [Any cleanup needed after all tests pass]
 
 ## Acceptance Criteria
@@ -96,7 +95,6 @@ A numbered list of RED-GREEN cycles:
 - [ ] Criterion 2
 - [ ] All new tests pass
 - [ ] Existing tests still pass
-
-</issue-template>
+```
 
 After creating the issue, print the issue URL and a one-line summary of the root cause.

@@ -25,11 +25,10 @@ Break the PRD into **tracer bullet** issues. Each issue is a thin vertical slice
 
 Slices may be 'HITL' or 'AFK'. HITL slices require human interaction, such as an architectural decision or a design review. AFK slices can be implemented and merged without human interaction. Prefer AFK over HITL where possible.
 
-<vertical-slice-rules>
+Rules:
 - Each slice delivers a narrow but COMPLETE path through every layer (schema, API, UI, tests)
 - A completed slice is demoable or verifiable on its own
 - Prefer many thin slices over few thick ones
-</vertical-slice-rules>
 
 ### 4. Quiz the user
 
@@ -55,7 +54,9 @@ For each approved slice, create a GitHub issue using `gh issue create`. Use the 
 
 Create issues in dependency order (blockers first) so you can reference real issue numbers in the "Blocked by" field.
 
-<issue-template>
+Issue template:
+
+```
 ## Parent PRD
 
 #<prd-issue-number>
@@ -82,7 +83,6 @@ Reference by number from the parent PRD:
 
 - User story 3
 - User story 7
-
-</issue-template>
+```
 
 Do NOT close or modify the parent PRD issue.
