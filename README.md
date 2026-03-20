@@ -29,6 +29,7 @@
 | **triage-issue** | 探索代码定位根因，创建含 TDD 修复方案的 GitHub Issue |
 | **improve-architecture** | 发现架构改进机会，通过深化浅模块提升可测试性 |
 | **request-refactor** | 通过用户访谈创建小步提交的重构方案，提交为 GitHub Issue |
+| **migrate-to-shoehorn** | 将测试文件的 as 类型断言迁移为 @total-typescript/shoehorn |
 
 ## 工具与配置
 
@@ -39,6 +40,7 @@
 | **fix-format** | 格式修正 |
 | **sync-skills** | 将已安装的 skills 同步到 GitHub 仓库 |
 | **verify-blockers** | 验证阻塞项 |
+| **scaffold-exercises** | 创建练习目录结构 |
 
 ## 写作与知识
 
@@ -178,6 +180,7 @@ A personal collection of agent skills for Claude Code, Cursor, and other AI codi
 | **triage-issue** | Triage a bug or issue by exploring the codebase to find root cause, then create a GitHub issue with a TDD-based fix plan. Use when user reports a bug, wants to file an issue, mentions "triage", or wants to investigate and plan a fix for a problem. |
 | **improve-architecture** | Explore a codebase to find opportunities for architectural improvement, focusing on making the codebase more testable by deepening shallow modules. Use when user wants to improve architecture, find refactoring opportunities, consolidate tightly-coupled modules, or make a codebase more AI-navigable. |
 | **request-refactor** | Create a detailed refactor plan with tiny commits via user interview, then file it as a GitHub issue. Use when user wants to plan a refactor, create a refactoring RFC, or break a refactor into safe incremental steps. |
+| **migrate-to-shoehorn** | Migrate test files from `as` type assertions to @total-typescript/shoehorn. Use when user mentions shoehorn, wants to replace `as` in tests, or needs partial test data. |
 
 ### Tooling & Setup
 | Skill | Description |
@@ -187,6 +190,7 @@ A personal collection of agent skills for Claude Code, Cursor, and other AI codi
 | **fix-format** |  |
 | **sync-skills** | Sync all installed skills and commands to GitHub repo yalding8/skills. Run after installing new skills. |
 | **verify-blockers** |  |
+| **scaffold-exercises** | Create exercise directory structures with sections, problems, solutions, and explainers that pass linting. Use when user wants to scaffold exercises, create exercise stubs, or set up a new course section. |
 
 ### Writing & Knowledge
 | Skill | Description |
