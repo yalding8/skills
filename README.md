@@ -133,6 +133,27 @@
 | **referral-program** | 设计推荐计划和口碑增长 |
 | **revops** | 收入运营、线索生命周期和市场-销售衔接 |
 
+## 认知与创作 — LJG
+
+来自 [ljg-skills](https://github.com/lijigang/ljg-skills) — 认知原子、视觉铸造和工作流串联。
+
+| 技能 | 说明 |
+|------|------|
+| **ljg-card** | 内容铸 PNG 卡片（长图/信息图/多卡/视觉笔记/漫画/白板） |
+| **ljg-invest** | 投资分析报告 — 判断项目是否是「秩序创造机器」 |
+| **ljg-learn** | 概念解剖 — 八维切割 + 顿悟压缩，输出 org-mode |
+| **ljg-paper** | 论文阅读器 — 为非学术人士提取论文思想 |
+| **ljg-paper-flow** | 论文流 — 读论文 → 铸卡片一气呵成 |
+| **ljg-plain** | 白话引擎 — 改写到 12 岁聪明小孩也能懂 |
+| **ljg-rank** | 降秩引擎 — 找出领域背后不可再少的独立生成器 |
+| **ljg-roundtable** | 圆桌讨论 — 真实人物多轮辩证对话 |
+| **ljg-skill-map** | 技能地图 — 扫描已安装技能渲染 ASCII 总览 |
+| **ljg-travel** | 旅行研究 — 城市文化 DBA + 便携参考卡片 |
+| **ljg-word** | 英语单词深度拆解（词源、核心意象、金句） |
+| **ljg-word-flow** | 词卡流 — 解词 → 铸信息图一气呵成 |
+| **ljg-writes** | 写作引擎 — 带观点出发，写的过程中想透 |
+| **ljg-x-download** | X/Twitter 媒体下载到本地 |
+
 ---
 
 ## 安装
@@ -274,6 +295,26 @@ From [Impeccable](https://github.com/pbakaus/impeccable) — design vocabulary f
 | **churn-prevention** | "When the user wants to reduce churn, build cancellation flows, set up save offers, recover failed payments, or implement retention strategies. Also use when the user mentions 'churn,' 'cancel flow,' 'offboarding,' 'save offer,' 'dunning,' 'failed payment recovery,' 'win-back,' 'retention,' 'exit survey,' 'pause subscription,' 'involuntary churn,' 'people keep canceling,' 'churn rate is too high,' 'how do I keep users,' or 'customers are leaving.' Use this whenever someone is losing subscribers or wants to build systems to prevent it. For post-cancel win-back email sequences, see email-sequence. For in-app upgrade paywalls, see paywall-upgrade-cro." |
 | **referral-program** | "When the user wants to create, optimize, or analyze a referral program, affiliate program, or word-of-mouth strategy. Also use when the user mentions 'referral,' 'affiliate,' 'ambassador,' 'word of mouth,' 'viral loop,' 'refer a friend,' 'partner program,' 'referral incentive,' 'how to get referrals,' 'customers referring customers,' or 'affiliate payout.' Use this whenever someone wants existing users or partners to bring in new customers. For launch-specific virality, see launch-strategy." |
 | **revops** | "When the user wants help with revenue operations, lead lifecycle management, or marketing-to-sales handoff processes. Also use when the user mentions 'RevOps,' 'revenue operations,' 'lead scoring,' 'lead routing,' 'MQL,' 'SQL,' 'pipeline stages,' 'deal desk,' 'CRM automation,' 'marketing-to-sales handoff,' 'data hygiene,' 'leads aren't getting to sales,' 'pipeline management,' 'lead qualification,' or 'when should marketing hand off to sales.' Use this for anything involving the systems and processes that connect marketing to revenue. For cold outreach emails, see cold-email. For email drip campaigns, see email-sequence. For pricing decisions, see pricing-strategy." |
+
+### Cognition & Creation — LJG
+From [ljg-skills](https://github.com/lijigang/ljg-skills) — cognitive atoms, visual casting, and workflow chaining.
+
+| Skill | Description |
+|-------|-------------|
+| **ljg-card** | "Content caster (铸). Transforms content into PNG visuals. Six molds: -l (default) long reading card, -i infograph, -m multi-card reading cards (1080x1440), -v visual sketchnote, -c comic (manga-style B&W), -w whiteboard (marker-style board layout). Output to ~/Downloads/. Use when user says '铸', 'cast', '做成图', '做成卡片', '做成信息图', '做成海报', '视觉笔记', 'sketchnote', '漫画', 'comic', 'manga', '白板', 'whiteboard'. Replaces ljg-cards and ljg-infograph." |
+| **ljg-invest** | 投资分析, 生成一份深度投资分析报告。不做传统投资分析——核心判断是项目是否是一台「秩序创造机器」。Use when user says '投资报告', '投资分析', '分析这个项目', '写投资报告', 'investment report', 'invest analysis', or provides entrepreneur conversation records wanting investment evaluation. Also trigger when user pastes or references meeting notes, pitch decks, or founder interviews and asks for analysis. |
+| **ljg-learn** | Deep concept anatomist that deconstructs any concept through 8 exploration dimensions (history, dialectics, phenomenology, linguistics, formalization, existentialism, aesthetics, meta-philosophy) and compresses insights into an epiphany. Use when user asks to explain, dissect, or deeply understand a concept, term, or idea. Triggers on '解剖概念', '概念解剖', 'explain concept', 'learn concept', '/ljg-learn'. Produces org-mode output. |
+| **ljg-paper** | "Paper reader for non-academics. Takes a paper and extracts its ideas for personal use. Focuses on understanding, not academic critique. Use when user shares an arxiv link, paper URL, PDF, or asks to analyze a research paper. Trigger words: '读论文', '分析论文', 'paper', or when user shares an academic paper." |
+| **ljg-paper-flow** | "Paper workflow: read papers + cast cards in one go. Takes one or more arxiv links, paper URLs, PDFs, or paper names. For each paper, runs ljg-paper (generates org analysis) then ljg-card -l (generates long reading card PNG). Use when user says '论文流', 'paper flow', '读论文并做卡片', '论文卡片', or provides multiple papers wanting both analysis and cards." |
+| **ljg-plain** | "Cognitive atom: Plain (白). Rewrites any content so a smart 12-year-old groks it. Structure-free — form follows content. Use when user says '白话说', '说人话', '解释一下', 'plain', 'grok'." |
+| **ljg-rank** | 给一个领域，找出背后真正撑着它的几根独立的力。十几个现象砍到不可再少的生成器——砍完能把现象一个个生回来，才算数。Use when user says '降秩', '找秩', '秩是什么', '这个领域靠什么撑着', '背后是什么', or wants to decompose any domain to its irreducible generators. |
+| **ljg-roundtable** | >- |
+| **ljg-skill-map** | "Skill map viewer. Scans all installed skills and renders a visual overview — name, version, description, category at a glance. Use when user says 'skills', '技能', '技能地图', 'skill map', '我有哪些技能', '看看技能', '列出技能', 'list skills'. Also trigger when user asks what skills are available or installed." |
+| **ljg-travel** | "Deep travel research workflow for museums and ancient architecture. Input a city name, auto-generates structured knowledge document (org-mode) + portable reference cards (PNG). Covers historical background, museum highlights, archaeological significance, and architectural heritage. Use when user says '旅行研究', '博物馆功课', '古建功课', 'travel research', '出发前功课', or provides a city name with intent to do deep cultural travel preparation." |
+| **ljg-word** | Deep-dive English word mastery tool. Deconstructs a single English word into core semantics and epiphany. Use when user asks to explain/master a specific English word. |
+| **ljg-word-flow** | "Word flow: deep-dive word analysis + infograph card in one go. Takes one or more English words, runs ljg-word (generates deep semantics analysis) then ljg-card -i (generates infograph PNG). Use when user says '词卡', 'word card', 'word flow', or provides English words wanting both analysis and visual card." |
+| **ljg-writes** | "写作引擎。带着一个观点出发，在写的过程中把它想透。" |
+| **ljg-x-download** | "Download images and videos from X (Twitter) posts to ~/Downloads. Use when user shares an X/Twitter link and wants to save media, or says '下载', 'download', '保存图片', '保存视频', or provides a x.com/twitter.com URL with intent to download media." |
 
 ### Install
 ```bash
