@@ -8,6 +8,7 @@ push.py — 把本地 Markdown 推送到飞书知识库（Wiki）。
   push.py --verify                 # 完整验证（token + 云空间 + wiki）
   push.py --login                  # OAuth 授权（首次用，30 天有效）
   push.py --list-wikis             # 列出当前用户可访问的所有 Wiki 空间
+  push.py --delete <wiki_url|token># 删除 Wiki 节点（换版删旧用，移入回收站可恢复）
   push.py --init-credentials <app_id> <app_secret>
                                    # 写入共享凭证（首次 setup 用）
   push.py --init-wiki <wiki_space_id>
@@ -270,6 +271,61 @@ def cmd_push(md_arg):
     print(wiki_url)  # stdout 只输出 URL，便于管道
 
 
+def _extract_wiki_token(arg):
+    """从 wiki URL 或裸 token 取出 node token。
+    支持 https://xxx.feishu.cn/wiki/<token>[?...] 或直接 <token>。
+    """
+    arg = arg.strip()
+    if "/wiki/" in arg:
+        arg = arg.split("/wiki/", 1)[1]
+    # 剥查询参数 / 锚点 / 多余路径段
+    return arg.split("?")[0].split("#")[0].split("/")[0]
+
+
+def _get_wiki_node(token):
+    """取 wiki 节点详情；返回 node dict 或 None（节点不存在）。"""
+    url = f"{fs.API_BASE}/wiki/v2/spaces/get_node?token={token}&obj_type=wiki"
+    try:
+        res = fs.user_authed_request(url)
+    except RuntimeError:
+        return None  # HTTP 4xx（如 404）
+    if res.get("code") != 0:
+        return None  # 业务码非 0（如 131005 not found）
+    return res.get("data", {}).get("node")
+
+
+def cmd_delete(arg):
+    """删除 Wiki 节点：取底层 obj_token → drive 文件删除（移入回收站，可恢复）。
+
+    用户身份 token 对自己创建的文档有删除权限——飞书 Wiki 无"删除节点"公开 API，
+    走删底层云文档使节点失效这条路。换版"推新→删旧→验证"的删旧步骤。
+    """
+    if not fs.credentials_exist():
+        raise SystemExit("尚未配置凭证。先运行：push.py --init-credentials <app_id> <app_secret>")
+    token = _extract_wiki_token(arg)
+    node = _get_wiki_node(token)
+    if not node:
+        raise SystemExit(f"未找到 Wiki 节点（token={token}）——可能已删除或 token 有误")
+    obj_token = node.get("obj_token")
+    obj_type = node.get("obj_type", "docx")
+    title = node.get("title", "")
+    if not obj_token:
+        raise SystemExit(f"节点缺 obj_token，无法删除：{node}")
+    print(f"→ 删除 Wiki 节点「{title}」(obj_type={obj_type}) ...", file=sys.stderr)
+    res = fs.user_authed_request(
+        f"{fs.API_BASE}/drive/v1/files/{obj_token}?type={obj_type}",
+        method="DELETE",
+    )
+    if res.get("code") != 0:
+        raise fs.FeishuError(f"删除失败: code={res.get('code')} msg={res.get('msg')}")
+    # 验证：节点应已不可查
+    if _get_wiki_node(token) is None:
+        print("  ✓ 已删除（移入回收站，可恢复）", file=sys.stderr)
+    else:
+        print("  ⚠️ 删除请求已受理，但节点暂时仍可查到（飞书索引延迟）", file=sys.stderr)
+    print(f"\n✅ 删除完成：{title}", file=sys.stderr)
+
+
 def main(argv):
     if not argv:
         raise SystemExit(__doc__)
@@ -290,6 +346,10 @@ def main(argv):
         cmd_verify()
     elif head == "--list-wikis":
         cmd_list_wikis()
+    elif head == "--delete":
+        if len(rest) != 1:
+            raise SystemExit("用法: push.py --delete <wiki_url|token>")
+        cmd_delete(rest[0])
     elif head == "--config-path":
         print(fs.CONFIG_DIR)
     elif head.startswith("-"):
