@@ -218,6 +218,9 @@ python3 ~/.claude/skills/feishu-wiki/push.py --verify
 # 列出可访问的 Wiki 空间
 python3 ~/.claude/skills/feishu-wiki/push.py --list-wikis
 
+# 删除 Wiki 节点（换版删旧用，移入回收站可恢复）
+python3 ~/.claude/skills/feishu-wiki/push.py --delete <wiki_url|token>
+
 # 写共享凭证（首次）
 python3 ~/.claude/skills/feishu-wiki/push.py --init-credentials <app_id> <app_secret>
 
@@ -232,5 +235,5 @@ python3 ~/.claude/skills/feishu-wiki/push.py --init-wiki <wiki_space_id>
 3. **md 上传到云空间根后保留**，飞书会留原始文件便于回溯
 4. **导入是异步任务**，飞书后端处理 5-30 秒，poll 最多等 180 秒
 5. **mount_type=1 挂到 Wiki 根**——`import_tasks` 接口不支持指定父节点，新文档在 Wiki 顶层。需要分类让用户在飞书界面拖
-6. **重复推送同名 md 会建新文档**（飞书 Wiki 没"按 title 替换"语义）。要更新让用户去飞书直接编辑或先删旧节点
+6. **重复推送同名 md 会建新文档**（飞书 Wiki 没"按 title 替换"语义）。**换版流程 = 推新 → `--delete <旧 wiki_url>` 删旧 → 验证**：`--delete` 用 OAuth 用户身份 token 删自己创建的文档（取 node 的 obj_token → drive 文件删除 → 移入回收站可恢复），无需人工进飞书 UI。注意 user_token 删的是**自己创建**的文档；删非本人文档可能无权限
 7. **共享凭证场景**：未来加 feishu-bitable 时，复用 `~/.config/feishu/credentials.json` 即可，setup 流程会自动跳过 Step 1-3
