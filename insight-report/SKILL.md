@@ -1,0 +1,61 @@
+---
+name: insight-report
+description: End-to-end pipeline for uhomes market-research / channel insight reports — frame a hypothesis, organize a survey, analyze the data, produce a magazine-style bilingual HTML report, and export a watermarked, print-ready PDF with a professional running header/footer. Use when the user wants to create a market insight or 调研/洞察 report, turn survey or DB data into a report, build an HTML insight page, or export a branded watermarked PDF — triggers include "insight", "洞察", "调研报告", "市场调研", "出一份报告", "加水印 PDF", "insight 报告".
+---
+
+# Insight Report
+
+Produces a uhomes-branded insight report across five stages. Stages 1–3 are methodology
+(do them with the user); stages 4–5 are deterministic and scripted.
+
+## The five stages
+
+1. **命题 (Frame)** — lock the question, the metric, the window, and the decision it informs
+   BEFORE seeing data. Write the pre-registration block into the report file. See REFERENCE.md
+   §Pre-registration. Don't change metrics/thresholds after opening the box.
+2. **组织调研 (Field)** — define the sample frame and fielding window. Data comes from a 飞书/Lark
+   survey (问卷/forms) and/or a DB cohort. If DB, pin the exact cohort 口径 (SQL) and show raw
+   rows first. See REFERENCE.md §Cohort & data discipline.
+3. **输出报告 (Analyze & write)** — run real SQL / tally before stating any number; show raw data,
+   then conclusions. Annotate every quantified claim `[已核实]`/`[AI 估算]`. Write findings as a
+   tight narrative (chapters + exhibits), bilingual (CN + EN) when for external sharing.
+4. **产生 HTML (Design)** — build the report as a magazine-style HTML page that conforms to the
+   **render contract** (brand fonts; `.rv` reveal blocks; `.bar i[data-w]` bars; `section.ch` /
+   `.ch-head` / `.cols` / `.stats` / `.pq` structure). The PDF script depends on these hooks.
+   See REFERENCE.md §HTML render contract. Produce one HTML per language.
+5. **输出 PDF (Export)** — render each HTML to a watermarked A4 PDF with the running
+   header/footer frame:
+
+   ```bash
+   python3 ~/.claude/skills/insight-report/scripts/build_pdf.py report.config.json
+   ```
+
+## Stage 5 quick start
+
+Create `report.config.json` next to the HTML files (paths relative to the config):
+
+```json
+{
+  "watermark": "Pro.uhomes.com",
+  "reports": [
+    { "src": "report-cn.html", "out": "Report-CN.pdf",
+      "title": "悉尼留学市场观察 · 2026", "brand": "异乡好居　渠道调研洞察" },
+    { "src": "report-en.html", "out": "Report-EN.pdf",
+      "title": "Sydney Student Housing Market · 2026", "brand": "uhomes.com　Channel Insights" }
+  ]
+}
+```
+
+Then run the script. Output: each PDF gets a tiled diagonal watermark, a running header
+(title left / brand right) and footer (small uhomes.com wordmark bottom-left + page numbers)
+on **every** page. After building, **verify visually** — rasterize pages (`pdftoppm -png`) and
+eyeball the boundaries; do not declare done from the page count alone.
+
+## Conventions (always)
+
+- Brand fonts: 中文 阿里普惠体 (Alibaba PuHuiTi) / 英文 Montserrat. Logo: bundled `assets/uhomes-logo-red.svg` (white variant for dark backgrounds).
+- Pre-register before results; show raw data before conclusions; annotate AI-estimated numbers.
+- Archive the report as `docs/ANALYSIS_YYYY-MM-DD_<topic>.md` and update the README index.
+
+See **[REFERENCE.md](REFERENCE.md)** for the render contract, pre-registration template, cohort
+discipline, the PDF config schema, and the design decisions behind the PDF pipeline.

@@ -1,0 +1,17 @@
+{
+  "watermark": "Pro.uhomes.com",
+  "reports": [
+    {
+      "src": "report-cn.html",
+      "out": "Report-CN.pdf",
+      "title": "悉尼留学市场观察 · 2026",
+      "brand": "异乡好居　渠道调研洞察"
+    },
+    {
+      "src": "report-en.html",
+      "out": "Report-EN.pdf",
+      "title": "Sydney Student Housing Market · 2026",
+      "brand": "uhomes.com　Channel Insights"
+    }
+  ]
+}
