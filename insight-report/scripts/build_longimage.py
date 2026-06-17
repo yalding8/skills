@@ -93,7 +93,7 @@ async def _cmd(ws, _id, method, params=None):
             return m.get("result", {})
 
 
-async def _render_one(ws, url, out_path, width, scale):
+async def _render_one(ws, url, out_png, out_pdf, width, scale):
     await _cmd(ws, 1, "Page.enable")
     await _cmd(ws, 5, "Emulation.setDeviceMetricsOverride",
               {"width": width, "height": 1200, "deviceScaleFactor": scale, "mobile": False})
@@ -106,12 +106,21 @@ async def _render_one(ws, url, out_path, width, scale):
     metrics = await _cmd(ws, 6, "Page.getLayoutMetrics")
     size = metrics.get("cssContentSize") or metrics.get("contentSize")
     height = int(size["height"]) + 2
+    # (a) continuous long PNG
     res = await _cmd(ws, 3, "Page.captureScreenshot", {
         "format": "png", "captureBeyondViewport": True,
         "clip": {"x": 0, "y": 0, "width": width, "height": height, "scale": 1},
     })
-    with open(out_path, "wb") as f:
+    with open(out_png, "wb") as f:
         f.write(base64.b64decode(res["data"]))
+    # (b) continuous long PDF — ONE tall page (no A4 pagination, no header/footer)
+    pdf = await _cmd(ws, 7, "Page.printToPDF", {
+        "printBackground": True, "displayHeaderFooter": False, "preferCSSPageSize": False,
+        "paperWidth": width / 96.0, "paperHeight": height / 96.0,
+        "marginTop": 0, "marginBottom": 0, "marginLeft": 0, "marginRight": 0, "scale": 1,
+    })
+    with open(out_pdf, "wb") as f:
+        f.write(base64.b64decode(pdf["data"]))
     return height
 
 
@@ -131,13 +140,14 @@ async def _run(jobs, width, scale):
                 break
             except Exception:
                 await asyncio.sleep(0.1)
-        for out_path, url in jobs:
+        for out_png, out_pdf, url in jobs:
             req = urllib.request.Request(f"http://127.0.0.1:{PORT}/json/new?about:blank", method="PUT")
             tab = json.loads(urllib.request.urlopen(req, timeout=10).read())
             try:
                 async with websockets.connect(tab["webSocketDebuggerUrl"], max_size=None) as ws:
-                    h = await _render_one(ws, url, out_path, width, scale)
-                print(f"OK  -> {out_path}  ({os.path.getsize(out_path)//1024} KB, {width}x{h}css @{scale}x)")
+                    h = await _render_one(ws, url, out_png, out_pdf, width, scale)
+                print(f"OK  -> {out_png}  ({os.path.getsize(out_png)//1024} KB, {width}x{h}css @{scale}x)")
+                print(f"OK  -> {out_pdf}  ({os.path.getsize(out_pdf)//1024} KB, single {width}x{h}css page)")
             finally:
                 try:
                     urllib.request.urlopen(f"http://127.0.0.1:{PORT}/json/close/{tab['id']}", timeout=10).read()
@@ -166,10 +176,11 @@ def main():
     for r in cfg["reports"]:
         src = os.path.join(base, r["src"])
         stem = os.path.splitext(os.path.basename(r["src"]))[0]
-        out = os.path.join(base, r.get("long", stem + "-long.png"))
+        out_png = os.path.join(base, r.get("long", stem + "-long.png"))
+        out_pdf = os.path.join(base, r.get("longpdf", stem + "-long.pdf"))
         tmp, url = prepare(src, watermark)
         tmps.append(tmp)
-        jobs.append((out, url))
+        jobs.append((out_png, out_pdf, url))
     try:
         asyncio.run(_run(jobs, width, scale))
     finally:
