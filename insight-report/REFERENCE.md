@@ -54,6 +54,10 @@ these hooks. The HTML **must** use them or the static PDF renders blank/animated
    it is a colophon, not body copy.
 4. **Every text block is atomic across pages.** `.note`, `.note p`, `.bignum`, `.pq`, `.act`,
    `.deck`, stat cells carry `break-inside:avoid` so a paragraph never splits across a page.
+5. **No billboard numbers next to a chart that already shows them.** A 100px `.bignum` beside a
+   bar chart of the same data reads as abrupt and redundant. Integrate the figure as a moderate
+   inline lead (`.note .fig`, ~26–38px coral) inside the note instead. Reserve big numbers for a
+   page with no competing chart.
 
 ### Logo strategy (by report type)
 
