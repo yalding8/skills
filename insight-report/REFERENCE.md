@@ -36,16 +36,45 @@ these hooks. The HTML **must** use them or the static PDF renders blank/animated
 | `class="rv"` on every animated/reveal block | script adds `.on` to force it visible in PDF |
 | `<span class="bar"><i data-w="46.7"></i></span>` | script sets `i.style.width` from `data-w` so bars fill |
 | `:root` CSS vars `--paper --ink --coral --harbour --sand --line` | print CSS references `var(--paper)` etc. |
-| `.masthead` (page-1 brand bar) | hidden in print; the CDP running header replaces it |
+| `.topbar` (page-1 logo lockup) | **visible in print** — holds the report-type logo + issue/date; see logo strategy below |
+| `.masthead` (legacy brand bar) | hidden in print; kept only for backward-compat (use `.topbar` instead) |
 | `section.ch` + `.ch-head` (number + `h2`) | section unit; header kept with its content, never orphaned |
-| `.cols` (2-col grid: charts left, note right) | forced back to 2 columns in print |
-| `.stats` (stat strip), `.bignum`, `.note`, `.pq` (pull-quote), `.waffle`, `.legend` | kept intact across page breaks |
-| `footer` (dark colophon block at the end) | kept intact; gets extra bottom compression |
+| `.cols` (**single-column stacked** grid: charts on top, note below) | forced to 1 column in print — **never left-right** |
+| `.stats` (stat strip), `.bignum`, `.note`, `.note p`, `.pq`, `.waffle`, `.legend`, `.act`, `.deck` | every text block kept intact across page breaks (no paragraph split mid-page) |
+| `footer` (dark colophon block at the end) | kept intact; source/disclaimer at **10px** (small, muted — not body size) |
+
+### Design rules (updated per brand review 2026-06)
+
+1. **No "boxed/segmented" look.** Do NOT wrap the stat strip in a heavy 2px box with 2px internal
+   dividers — it reads as segmented and breaks badly across pages. Use a light strip: hairline
+   top/bottom rules + thin `var(--line)` dividers, no outer box.
+2. **Stacked, not side-by-side.** `.cols` is a single column: each exhibit is a full-width chart
+   followed by its note **below** it. No left-chart / right-note two-column layout.
+3. **Footer fine print is small.** Source + disclaimer in `footer p` at ~10px, muted color —
+   it is a colophon, not body copy.
+4. **Every text block is atomic across pages.** `.note`, `.note p`, `.bignum`, `.pq`, `.act`,
+   `.deck`, stat cells carry `break-inside:avoid` so a paragraph never splits across a page.
+
+### Logo strategy (by report type)
+
+Reports come in three types; the **top logo (`.topbar`) differs by type**, the footer corner
+mark is always the uhomes wordmark:
+
+| Report type | `.topbar` logo | Footer mark |
+|---|---|---|
+| **City** (e.g. Cardiff market) | uhomes own logo (`assets/uhomes-logo-red.svg`), placed top-left | uhomes |
+| **University** (single-school deep dive) | that university's logo top-left + small "× uhomes" lockup | uhomes |
+| **Apartment / property** | that apartment brand's logo top-left + "× uhomes" | uhomes |
+
+Put the logo as an `<img>` in `.topbar` at the top of `.wrap` (height ~30px), with the issue/date
+on the right. `.topbar` stays visible in print (unlike `.masthead`). The CDP running header (thin
+text title/brand) still repeats on interior pages for continuity.
 
 Design system: brand fonts (阿里普惠体 / Montserrat via `@font-face` + Google Fonts `@import`);
 warm paper palette; numbered chapters; each exhibit has a title (`.ct`/`.cn2`) + source line.
-Reuse the Crazy Thursday Sydney report HTML as a worked example
-(`share/sydney-2026/sydney-insight-2026-*.html`).
+**Canonical worked example: the Cardiff report** (`~/Projects/uhomes-insights/cardiff-2026/
+cardiff-insight-2026-*.html`) — it embodies all the rules above. (The older Sydney report predates
+the stacked/de-boxed redesign.)
 
 ## PDF pipeline (Stage 5)
 

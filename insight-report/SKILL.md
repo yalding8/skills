@@ -53,7 +53,13 @@ eyeball the boundaries; do not declare done from the page count alone.
 
 ## Conventions (always)
 
-- Brand fonts: 中文 阿里普惠体 (Alibaba PuHuiTi) / 英文 Montserrat. Logo: bundled `assets/uhomes-logo-red.svg` (white variant for dark backgrounds).
+- Brand fonts: 中文 阿里普惠体 (Alibaba PuHuiTi) / 英文 Montserrat.
+- **Layout (brand review 2026-06): stacked not boxed.** Single-column `.cols` (chart on top, note
+  below — never left-right); no heavy boxed stat strip; footer source/disclaimer at ~10px; every
+  text block atomic across pages. See REFERENCE.md §Design rules.
+- **Logo by report type**: top `.topbar` logo = uhomes own (city report) / the university's logo
+  (university report) / the apartment brand's logo (apartment report); footer corner mark always
+  uhomes. See REFERENCE.md §Logo strategy. Bundled: `assets/uhomes-logo-red.svg` (+ white variant).
 - Pre-register before results; show raw data before conclusions; annotate AI-estimated numbers.
 - Archive the report as `docs/ANALYSIS_YYYY-MM-DD_<topic>.md` and update the README index.
 

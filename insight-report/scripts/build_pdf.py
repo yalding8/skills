@@ -126,18 +126,18 @@ def head_inject(watermark_text):
   .pq{{margin:16px auto !important}} .pq blockquote{{font-size:19px !important}}
   .acts .act{{padding:9px 0 !important}} .act h3{{margin-bottom:4px !important}}
   footer{{margin-top:8px !important;padding:22px 0 !important;break-inside:avoid}}
-  footer p{{margin-top:8px !important}}
-  .cols{{grid-template-columns:1.15fr .85fr !important;gap:32px !important}}
+  footer p{{margin-top:8px !important;font-size:10px !important;line-height:1.7 !important}}
+  /* stacked layout: charts on top, note below (no left-right split) */
+  .cols{{grid-template-columns:1fr !important;gap:22px !important}}
   .stats{{grid-template-columns:repeat(4,1fr) !important}}
-  .stats .cell{{border-right:2px solid var(--ink) !important;border-bottom:none !important}}
-  .stats .cell:last-child{{border-right:none !important}}
   .hero .meta{{grid-template-columns:repeat(4,1fr) !important}}
-  /* flow cross-page handling: never split a bar mid-row, never orphan a heading */
+  /* flow cross-page handling: never split a bar mid-row, never orphan a heading,
+     keep every text block (note/paragraph/card) intact across page breaks */
   .bar-row{{break-inside:avoid}}
-  .note,.bignum,.pq,.waffle,.legend,.act{{break-inside:avoid}}
+  .note,.note p,.bignum,.pq,.waffle,.legend,.act,.stats .cell,.ch-head p.sub,.deck{{break-inside:avoid}}
   .chart .ct,.chart .cn2{{break-after:avoid}}
   .ch-head{{break-after:avoid;break-inside:avoid}}
-  h1,h2,h3{{break-after:avoid}}
+  h1,h2,h3,h4{{break-after:avoid}}
 }}
 {wm}
 </style>
