@@ -29,14 +29,16 @@ Produces a uhomes-branded insight report across five stages. Stages 1–3 are me
      ```bash
      python3 ~/.claude/skills/insight-report/scripts/build_pdf.py report.config.json
      ```
-   - **长图 / long PNG** (one continuous scroll image, NO pagination, NO per-page
-     header/footer/whitespace) — for WeChat / Feishu / social sharing:
+   - **长版本 / continuous** (one single tall page — NO A4 pagination, NO per-page
+     header/footer/whitespace) — for WeChat / Feishu / social / scroll reading:
      ```bash
      python3 ~/.claude/skills/insight-report/scripts/build_longimage.py report.config.json
      ```
-     Emits `<src>-long.png` per report. Optional config keys: `width` (col px, default 1200),
-     `scale` (DPR, default 2), shares `watermark`. **Default to the long PNG when the user wants
-     a "长版本" / continuous report rather than A4 pages.**
+     Emits BOTH `<src>-long.png` (raster 长图) AND `<src>-long.pdf` (single-page vector PDF,
+     selectable text, small file) per report. Optional config keys: `width` (col px, default
+     1200), `scale` (PNG DPR, default 2), shares `watermark`. **When the user wants a "长版本" /
+     continuous report rather than A4 pages, use THIS — both the PNG and the long PDF are
+     continuous; `build_pdf.py` is only for formal A4-paginated output.**
 
 ## Stage 5 quick start
 
