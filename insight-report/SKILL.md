@@ -23,12 +23,20 @@ Produces a uhomes-branded insight report across five stages. Stages 1–3 are me
    **render contract** (brand fonts; `.rv` reveal blocks; `.bar i[data-w]` bars; `section.ch` /
    `.ch-head` / `.cols` / `.stats` / `.pq` structure). The PDF script depends on these hooks.
    See REFERENCE.md §HTML render contract. Produce one HTML per language.
-5. **输出 PDF (Export)** — render each HTML to a watermarked A4 PDF with the running
-   header/footer frame:
+5. **输出 (Export)** — two output modes from the SAME `report.config.json`:
 
-   ```bash
-   python3 ~/.claude/skills/insight-report/scripts/build_pdf.py report.config.json
-   ```
+   - **A4 PDF** (paginated, watermark + running header/footer) — for formal/print:
+     ```bash
+     python3 ~/.claude/skills/insight-report/scripts/build_pdf.py report.config.json
+     ```
+   - **长图 / long PNG** (one continuous scroll image, NO pagination, NO per-page
+     header/footer/whitespace) — for WeChat / Feishu / social sharing:
+     ```bash
+     python3 ~/.claude/skills/insight-report/scripts/build_longimage.py report.config.json
+     ```
+     Emits `<src>-long.png` per report. Optional config keys: `width` (col px, default 1200),
+     `scale` (DPR, default 2), shares `watermark`. **Default to the long PNG when the user wants
+     a "长版本" / continuous report rather than A4 pages.**
 
 ## Stage 5 quick start
 
