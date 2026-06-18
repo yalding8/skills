@@ -140,7 +140,7 @@ def head_inject(watermark_text, wm_logo_uri=None):
     return f"""
 <style id="pdf-overrides">
 .rv{{opacity:1 !important;transform:none !important;transition:none !important}}
-.bar i{{transition:none !important}}
+.bar i,.col i{{transition:none !important}}
 .masthead{{display:none !important}}   /* CDP running header replaces the page-1 masthead */
 @media print{{
   html,body{{-webkit-print-color-adjust:exact;print-color-adjust:exact;background:var(--paper) !important}}
