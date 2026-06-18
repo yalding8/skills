@@ -77,8 +77,13 @@ body{font-family:var(--cn);background:var(--paper);color:var(--ink);line-height:
 /* light cards (brand review 2026-06-18): each stat is its own card — soft white fill,
    rounded, hairline border. This is the *light* card the brand approved, NOT the old heavy
    2px segmented box that broke across pages. Colour is SEMANTIC only: +green / −red / neutral ink. */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:clamp(36px,6vw,64px) 0}
-.stats .cell{padding:20px 20px 18px;background:#fff;border:1px solid var(--line);border-radius:12px;break-inside:avoid}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:clamp(36px,6vw,64px) 0}
+/* defined card: white fill, rounded, soft elevation shadow, and a 3px semantic top accent
+   (green=growth / red=decline / grey=neutral) so cards read unmistakably AND signal the sign */
+.stats .cell{padding:22px 20px 18px;background:#fff;border:1px solid var(--line);border-top:3px solid var(--data);border-radius:12px;box-shadow:0 3px 14px rgba(28,43,51,.08);break-inside:avoid}
+.stats .cell.pos{border-top-color:var(--up)}
+.stats .cell.neg{border-top-color:var(--down)}
+.stats .cell.neutral{border-top-color:var(--data)}
 .stats b{font-family:var(--serif-num);font-weight:800;font-size:clamp(26px,3.2vw,40px);display:block;line-height:1.1;color:var(--ink)}
 /* leading +/− rendered as a balanced small affix (Montserrat's U+2212 is a wide bar that otherwise outweighs the compact +) */
 .stats b .sgn{display:inline-block;font-size:.66em;transform:translateY(-0.13em);margin-right:.02em;font-weight:800}

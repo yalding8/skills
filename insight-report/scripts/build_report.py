@@ -664,6 +664,8 @@ def render_stat_cells(stats):
             else:
                 tone = ""
         cls = ' class="%s"' % tone if tone else ""
+        # tone also goes on the CARD so its top accent rule + number colour match
+        cellcls = "cell" + ((" " + tone) if tone else "")
         # Wrap a leading +/− in <span class="sgn">: Montserrat draws U+2212 as a wide
         # bar that visually outweighs the compact +, so render the sign as a small,
         # raised affix to balance the pair. Unsigned numbers are emitted as-is.
@@ -673,7 +675,8 @@ def render_stat_cells(stats):
             disp = '%s<span class="sgn">%s</span>%s' % (lead, stripped[0], stripped[1:])
         else:
             disp = b
-        out.append('    <div class="cell"><b%s>%s</b><span>%s</span></div>' % (cls, disp, s["span"]))
+        out.append('    <div class="%s"><b%s>%s</b><span>%s</span></div>'
+                   % (cellcls, cls, disp, s["span"]))
     return "\n".join(out)
 
 
