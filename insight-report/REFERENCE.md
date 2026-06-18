@@ -97,7 +97,7 @@ PDF/PNG renders blank/animated-out:
 | Version | `.topbar` logo |
 |---|---|
 | **EN** report (`lang: "en"`) | **uhomes.com wordmark ONLY** (`assets/uhomes-logo-red.svg`) |
-| **CN** report (`lang: "cn"`) | **combined lockup**: 异乡好居 (`assets/uhomes-cn-logo-red.svg`) ｜ uhomes.com — rendered as `.logolock` (中文主标 height 30px + thin divider + uhomes.com 17px) |
+| **CN** report (`lang: "cn"`) | **3-brand combined logo 异乡好居 ｜ 异乡缴费 ｜ 异乡人才** — single official asset `assets/uhomes-cn-combined-logo.svg` (`.logo-combined`, height 26px, wide ~13:1) |
 
 The generator picks this from `lang`; leave `content.topbar` with just `issue` (no `logo_src`).
 

@@ -435,8 +435,8 @@ def render_stat_cells(stats):
 
 def build_logo_html(lang, topbar):
     """Topbar logo by rule:
-    - EN report  → uhomes.com wordmark only (uhomes-logo-red.svg)
-    - CN report  → combined lockup 异乡好居 + uhomes.com
+    - EN report → uhomes.com wordmark only (uhomes-logo-red.svg)
+    - CN report → 3-brand combined logo 异乡好居+异乡缴费+异乡人才 (uhomes-cn-combined-logo.svg)
     Content can override: topbar.logo_html (full custom) or topbar.logo_src
     (single img, for university/apartment report-type logos)."""
     if topbar.get("logo_html"):
@@ -445,11 +445,8 @@ def build_logo_html(lang, topbar):
         alt = topbar.get("logo_alt", "uhomes.com")
         return '<img class="logo" src="%s" alt="%s">' % (topbar["logo_src"], alt)
     if lang == "cn":
-        return ('<span class="logolock">'
-                '<img class="logo logo-cn" src="uhomes-cn-logo-red.svg" alt="异乡好居">'
-                '<span class="logo-div"></span>'
-                '<img class="logo logo-en" src="uhomes-logo-red.svg" alt="uhomes.com">'
-                '</span>')
+        return ('<img class="logo logo-combined" src="uhomes-cn-combined-logo.svg" '
+                'alt="异乡好居 异乡缴费 异乡人才">')
     return '<img class="logo" src="uhomes-logo-red.svg" alt="uhomes.com">'
 
 

@@ -101,9 +101,9 @@ python3 ~/.claude/skills/insight-report/scripts/preflight.py report.config.json
   below — never left-right); no heavy boxed stat strip; footer source/disclaimer at ~10px; every
   text block atomic across pages. See REFERENCE.md §Design rules.
 - **Logo by language (auto)**: EN report → **uhomes.com only** (`uhomes-logo-red.svg`); CN report →
-  **combined lockup 异乡好居 ｜ uhomes.com** (`uhomes-cn-logo-red.svg` + uhomes.com). `build_report.py`
-  picks this from `lang` — leave `content.topbar` as just `issue`. Override per report-type
-  (university/apartment) via `content.topbar.logo_src`. See REFERENCE.md §Logo strategy.
+  **3-brand combined logo 异乡好居 ｜ 异乡缴费 ｜ 异乡人才** (`uhomes-cn-combined-logo.svg`).
+  `build_report.py` picks this from `lang` — leave `content.topbar` as just `issue`. Override per
+  report-type (university/apartment) via `content.topbar.logo_src`. See REFERENCE.md §Logo strategy.
 - Pre-register before results; show raw data before conclusions; annotate AI-estimated numbers.
 - Archive the report as `docs/ANALYSIS_YYYY-MM-DD_<topic>.md` and update the README index.
 
