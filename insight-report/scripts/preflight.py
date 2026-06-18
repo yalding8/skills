@@ -268,6 +268,29 @@ def check_title_orphan(body, css, out):
         out.append(Result("title-orphan", PASS, "no <h1> fragment exceeds 9 CJK chars"))
 
 
+def check_legacy_bar_colors(body, css, out):
+    """8b. 4-colour discipline (brand review 2026-06-18): a `.bar` carrying a legacy
+    positional colour class (sand / coral / ink) -> WARN. New content should default to
+    neutral grey and opt in with semantic hl (brand) / up (green) / neg (decline-red).
+    Positional/decorative colour is exactly the 'colours mean nothing' confusion that
+    review flagged."""
+    pat = re.compile(r'class\s*=\s*["\']([^"\']*)["\']', re.I)
+    legacy = {"sand", "coral", "ink"}
+    bad = 0
+    for m in pat.finditer(body):
+        toks = set(m.group(1).split())
+        if "bar" in toks and (toks & legacy):
+            bad += 1
+    if bad:
+        out.append(Result("bar-color-discipline", WARN,
+                          '{} 个 .bar 使用了 legacy 位置色类 (sand/coral/ink)；'
+                          '4 色系统要求默认中性灰,语义高亮用 hl(品牌)/up(增长绿)/neg(下降红)'
+                          .format(bad)))
+    else:
+        out.append(Result("bar-color-discipline", PASS,
+                          "no legacy positional bar colour classes (4-colour system clean)"))
+
+
 def check_render_contract(body, css, out):
     """8. reveal/render contract: each class="bar" should contain <i data-w=...>;
     `.rv` must exist; `:root` must declare --paper/--coral (and other key vars).
@@ -466,6 +489,7 @@ def lint_report(report, cfg_dir):
     check_two_column_cols(body, css, results)
     check_topbar(body, css, results)
     check_title_orphan(body, css, results)
+    check_legacy_bar_colors(body, css, results)
     check_render_contract(body, css, results)
 
     # locate matching PDF(s): the configured `out`, plus any *-long.pdf beside the src

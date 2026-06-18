@@ -159,7 +159,9 @@ def head_inject(watermark_text, wm_logo_uri=None):
   /* flow cross-page handling: never split a bar mid-row, never orphan a heading,
      keep every text block (note/paragraph/card) intact across page breaks */
   .bar-row{{break-inside:avoid}}
-  .note,.note p,.bignum,.pq,.waffle,.legend,.act,.stats .cell,.ch-head p.sub,.deck{{break-inside:avoid}}
+  /* new chart variants are atomic units — never split a column chart / line / donut across pages */
+  .col-chart,.linechart,.donut-chart{{break-inside:avoid}}
+  .note,.note p,.bignum,.pq,.waffle,.legend,.donut-legend,.act,.stats .cell,.ch-head p.sub,.deck{{break-inside:avoid}}
   .chart .ct,.chart .cn2{{break-after:avoid}}
   .ch-head{{break-after:avoid;break-inside:avoid}}
   h1,h2,h3,h4{{break-after:avoid}}
@@ -176,6 +178,9 @@ BODY_INJECT = """
   document.querySelectorAll('.rv').forEach(function(el){el.classList.add('on');});
   document.querySelectorAll('.bar i').forEach(function(b){
     if(b.dataset && b.dataset.w){b.style.width=b.dataset.w+'%';}
+  });
+  document.querySelectorAll('.col i').forEach(function(b){
+    if(b.dataset && b.dataset.h){b.style.height=b.dataset.h+'%';}
   });
 })();
 </script>
