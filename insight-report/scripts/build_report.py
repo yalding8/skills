@@ -297,6 +297,9 @@ def render_bars(chart):
             wtxt = "0"
         elif explicit_w is not None:
             wtxt = fmt_w(explicit_w)
+        elif mode == "percent":
+            # percent shares are authored as ints (47/40/13) -> bare int width
+            wtxt = str(int(w)) if w == int(w) else ("%.1f" % w)
         else:
             wtxt = "%.1f" % w
 

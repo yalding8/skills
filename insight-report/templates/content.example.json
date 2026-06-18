@@ -1,0 +1,117 @@
+{
+  "__doc__": "ANNOTATED EXAMPLE content JSON for build_report.py. Copy this, rename to content.cn.json / content.en.json, edit the values, then: python3 scripts/build_report.py content.cn.json. Keys prefixed __ are comments and are ignored by the renderer ONLY if you delete them — string.Template does not strip them, so REMOVE all __* keys in your real file. (Real working copies live next to the Cardiff report: cardiff-2026/content.cn.json / content.en.json.)",
+
+  "lang": "cn",
+  "__lang": "'cn' or 'en'. Picks the built-in typography preset (fonts, sizes, quote glyph). CN uses Alibaba PuHuiTi; EN uses Montserrat. This is the ONLY thing that switches the whole look — you never touch CSS.",
+
+  "output": "report-cn.html",
+  "__output": "output HTML filename, relative to this JSON's folder. Override with -o on the CLI.",
+
+  "__style": "OPTIONAL. A dict of CSS-value overrides on top of the preset, e.g. {\"hero_h1_size\":\"clamp(40px,7vw,80px)\"}. Omit entirely unless you must deviate. See PRESET_CN/PRESET_EN keys in build_report.py for the full list.",
+
+  "head": {
+    "lang_attr": "zh-CN",
+    "__lang_attr": "<html lang=...> value. Defaults zh-CN for cn / en for en.",
+    "meta_description": "...SEO description...",
+    "og_title": "...social share title...",
+    "og_description": "...social share one-liner...",
+    "page_title": "...browser tab title..."
+  },
+
+  "topbar": {
+    "logo_src": "uhomes-logo-red.svg",
+    "__logo_src": "path to logo, relative to the HTML. Keep uhomes-logo-red.svg alongside the output (inv 1: logo stays visible in print).",
+    "logo_alt": "uhomes.com",
+    "issue": "卡迪夫市场观察<br>2026 年 6 月",
+    "__issue": "right-aligned issue line; <br> allowed."
+  },
+
+  "hero": {
+    "kicker": "留学租房数据洞察 · 内部决策版",
+    "h1": "上涨的英国市场里，<br>卡迪夫，<span class=\"accent\">掉队的城</span>",
+    "__h1": "headline. <br> for line breaks, <span class=\"accent\">...</span> for the coral-red emphasis word (inv 8).",
+    "deck": "...lead paragraph under the headline...",
+    "meta": [
+      { "b": "1,318", "span": "副标注（描述这个数字）" },
+      { "b": "76%", "span": "..." },
+      { "b": "2016–26", "span": "..." },
+      { "b": "06-17", "span": "..." }
+    ],
+    "__meta": "exactly 4 hero stat cells: b = big green number, span = small caption."
+  },
+
+  "stats": [
+    { "b": "+11.7%", "span": "..." },
+    { "b": "+22.3%", "span": "..." },
+    { "b": "−2.5%", "span": "..." },
+    { "b": "#17 · 8.7%", "span": "..." }
+  ],
+  "__stats": "the headline stat strip (inv 2: hairline top/bottom rules, thin dividers, NO box). Exactly 4 cells; colors are auto: green / ink / coral / sand by position.",
+
+  "chapters": [
+    {
+      "num": "01",
+      "h2": "章节标题",
+      "sub": "章节副标题（可选）",
+      "blocks": [
+        {
+          "type": "chart",
+          "ct": "图表标题（绿色小字）",
+          "cn2": "图表副说明（灰色小字）",
+          "mode": "scale",
+          "__mode": "BAR HELPER MODE. 'scale' (default): data-w = value/max*scale, for raw magnitudes. 'percent': data-w = value, printed as N%, for shares summing to 100 (inv 6 progress bars). 'raw_w': you give w + value_text, no math, for YoY-% charts where bar length is a manual visual encoding.",
+          "scale": 95,
+          "__scale": "only used by mode 'scale'; biggest bar maps to this width (~95). Default 95.",
+          "bars": [
+            { "label": "2021 峰", "value": 746, "style": "coral", "hl": true },
+            { "label": "2022", "value": 655 },
+            { "label": "2025", "value": 314, "style": "sand" }
+          ],
+          "__bars": "Each row: label (str, right of bar) + value (number). style: ''|'coral'|'sand'|'ink' bar color. hl: highlight (bold label, coral val). value_text: override printed cell (e.g. '+22%','2.0万'). w: explicit data-w (REQUIRED for raw_w; in scale mode use it to reproduce hand-tuned widths 1:1). neg:true OR value<0 -> width 0, coral val, minus sign kept (inv: ch05 negatives)."
+        },
+        {
+          "type": "note",
+          "h4": "注解小标题",
+          "fig": "−58%",
+          "__fig": "OPTIONAL inline restrained number prepended to the FIRST paragraph (inv 5: this is the .fig style, NOT a giant .bignum billboard).",
+          "style": "margin-top:6px",
+          "__style": "OPTIONAL raw inline style on the .note div.",
+          "ps": [
+            "第一段（可含 <b>加粗</b>）。",
+            "第二段。"
+          ],
+          "__ps": "list of paragraph HTML strings. Inline <b> for emphasis."
+        }
+      ],
+      "__blocks": "ordered list of blocks rendered inside the chapter. chart/note blocks auto-wrap in a single-column .cols container (inv 3: never left-right, chart on top / note below). Wrap a block in {\"type\":\"group\",\"blocks\":[...]} to nest it in a bare <div> (matches the source's column wrappers; purely structural).",
+      "pull_quote": {
+        "quote": "整段引言。",
+        "cite": "异乡好居数据洞察"
+      },
+      "__pull_quote": "OPTIONAL. Rendered after the chapter blocks (inv 9: coral quote mark + cite)."
+    },
+    {
+      "num": "06",
+      "h2": "结论与方向建议",
+      "sub": "...",
+      "blocks": [
+        {
+          "type": "acts",
+          "items": [
+            { "h3": "建议标题 <em>红色强调</em>", "p": "建议正文。" },
+            { "h3": "...", "p": "..." }
+          ],
+          "__items": "the numbered recommendation list. h3 supports <em>...</em> for coral emphasis. A chapter whose blocks are all 'acts' renders them at section level (no .cols wrapper)."
+        }
+      ]
+    }
+  ],
+
+  "footer": {
+    "brand": "异乡好居",
+    "__brand": "EN can use 'uhomes<em>.com</em>' to color '.com' coral.",
+    "note": "数据来源... (可含 <code>table_name</code>) ...仅供内部决策参考。",
+    "__note": "footer fine print, rendered at 10px (inv 4). Inline <code> allowed.",
+    "tag": "卡迪夫市场观察 · 2026"
+  }
+}
