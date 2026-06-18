@@ -16,6 +16,10 @@ metadata:
 
 把当前会话生成的 Markdown 文档推送到飞书 Wiki，自动转换为可在线协作的飞书 Docs。
 
+> ⚠️ **限制：md 导入不携带本地图片/附件。** 飞书 `import_tasks` 只转文本结构，md 里 `![](本地图.png)` 这类**本地引用的图片不会被上传**，推上去的文档没有图。**要在 Wiki 文档里放长图（视觉报告长截图）或 PDF 附件**，两条路：
+> 1. `python3 push.py --embed <wiki_url> --image <png> [--file <pdf>]` —— 程序化插入图片块/文件块到文档顶部。**需应用开通 `docx:document` 用户权限**（先跑 `--status` 看「图片嵌入」预检行）。
+> 2. 在飞书界面**手动把长图/PDF 拖进文档**（无需任何权限，最稳）。
+
 ## 架构（重要：与未来 feishu-* skills 共享凭证）
 
 ```
@@ -221,6 +225,10 @@ python3 ~/.claude/skills/feishu-wiki/push.py --list-wikis
 # 删除 Wiki 节点（换版删旧用，移入回收站可恢复）
 python3 ~/.claude/skills/feishu-wiki/push.py --delete <wiki_url|token>
 
+# 把长图/PDF 嵌进已存在的 Wiki 文档顶部（md 导入不带图，要图用这个）
+# 需 docx:document 用户权限；缺权限会优雅降级给出开通指引（退出码 2）
+python3 ~/.claude/skills/feishu-wiki/push.py --embed <wiki_url|token> --image <png> [--file <pdf>]
+
 # 写共享凭证（首次）
 python3 ~/.claude/skills/feishu-wiki/push.py --init-credentials <app_id> <app_secret>
 
@@ -237,3 +245,4 @@ python3 ~/.claude/skills/feishu-wiki/push.py --init-wiki <wiki_space_id>
 5. **mount_type=1 挂到 Wiki 根**——`import_tasks` 接口不支持指定父节点，新文档在 Wiki 顶层。需要分类让用户在飞书界面拖
 6. **重复推送同名 md 会建新文档**（飞书 Wiki 没"按 title 替换"语义）。**换版流程 = 推新 → `--delete <旧 wiki_url>` 删旧 → 验证**：`--delete` 用 OAuth 用户身份 token 删自己创建的文档（取 node 的 obj_token → drive 文件删除 → 移入回收站可恢复），无需人工进飞书 UI。注意 user_token 删的是**自己创建**的文档；删非本人文档可能无权限
 7. **共享凭证场景**：未来加 feishu-bitable 时，复用 `~/.config/feishu/credentials.json` 即可，setup 流程会自动跳过 Step 1-3
+8. **`--embed` 把视觉报告放进文档**：流程是「解析 wiki node → 取 docx obj_token → 文档顶部插图片块(block_type 27)/文件块(23) → 上传媒体绑到块 → PATCH 回填 token」。**前提是该 wiki 节点本身是 docx 文档**（非 docx 节点会报错）。`--embed` 操作的是**已存在**的文档——典型用法是先 `push.py <md>` 推出文档，再 `--embed <返回的 wiki_url> --image 长图.png`。缺 `docx:document` 用户权限时不会糊 traceback，而是打印「开权限 → 重新发版 → 重新 `--login`」三步指引并以退出码 2 退出。`--status` 的「图片嵌入」行会提前告诉你这个能力是否就绪。

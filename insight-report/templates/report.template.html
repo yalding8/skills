@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="$lang">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="$meta_description">
+<meta property="og:title" content="$og_title">
+<meta property="og:description" content="$og_description">
+<meta property="og:type" content="article">
+<title>$page_title</title>
+<style>
+$font_face
+@import url('$montserrat_import');
+
+:root{
+  --paper:#faf6ef;
+  --paper-deep:#f3ecdf;
+  --ink:#1c2b33;
+  --ink-soft:#44565f;
+  --harbour:#2f6e4f;
+  --coral:#c8102e;
+  --coral-deep:#a50d26;
+  --sand:#d9a441;
+  --line:#d8cdb9;
+  --serif-num:'Montserrat',sans-serif;
+  --cn:$font_body;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--cn);background:var(--paper);color:var(--ink);line-height:$body_line_height;font-size:16px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 clamp(20px,5vw,64px)}
+
+.rv{opacity:0;transform:translateY(28px);transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1)}
+.rv.on{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.bar i{transition:none!important}}
+
+/* top logo lockup — city report uses uhomes own logo, stays visible in print */
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:22px 0 16px;border-bottom:1.5px solid var(--ink)}
+.topbar .logo{height:34px;width:auto;display:block}
+.topbar .issue{font-family:var(--serif-num);font-size:11px;letter-spacing:${topbar_issue_ls};text-transform:uppercase;color:var(--ink-soft);text-align:right}
+.masthead{display:none}
+
+.hero{padding:clamp(48px,9vw,110px) 0 clamp(36px,6vw,72px);position:relative}
+.hero .kicker{display:inline-flex;align-items:center;gap:10px;font-family:var(--serif-num);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--harbour);font-weight:600;margin-bottom:26px}
+.hero .kicker::before{content:'';width:36px;height:2px;background:var(--coral)}
+.hero h1{font-size:$hero_h1_size;line-height:$hero_h1_lh;font-weight:$hero_h1_weight;letter-spacing:$hero_h1_ls;max-width:${hero_h1_maxw}}
+.hero h1 .accent{color:var(--coral)}
+.hero .deck{margin-top:30px;max-width:${hero_deck_maxw};color:var(--ink-soft);font-size:clamp(15px,1.6vw,18px)}
+.hero .meta{margin-top:40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.hero .meta div{padding:16px 20px;border-right:1px solid var(--line)}
+.hero .meta div:first-child{padding-left:0}
+.hero .meta div:last-child{border-right:none}
+.hero .meta b{display:block;font-family:var(--serif-num);font-weight:800;font-size:22px;color:var(--harbour)}
+.hero .meta span{font-size:12px;color:var(--ink-soft);letter-spacing:${hero_meta_ls}}
+
+.skyline{margin:clamp(20px,4vw,46px) 0 0;width:100%;overflow:hidden}
+.skyline svg{width:100%;height:auto;display:block}
+.skyline .ln{fill:none;stroke:var(--ink);stroke-width:2.2}
+.skyline .fl{fill:var(--paper-deep)}
+.skyline .dragon{fill:var(--coral)}
+.skyline .grass{stroke:var(--harbour);stroke-width:1.6;fill:none;opacity:.55}
+
+/* light stat strip — hairline top/bottom rules, thin dividers, no boxed look */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));border-top:2px solid var(--ink);border-bottom:1px solid var(--line);margin:clamp(36px,6vw,64px) 0}
+.stats .cell{padding:24px 22px 22px 0;border-right:1px solid var(--line);break-inside:avoid}
+.stats .cell:last-child{border-right:none}
+.stats b{font-family:var(--serif-num);font-weight:800;font-size:clamp(28px,3.4vw,42px);display:block;line-height:1.1}
+.stats .cell:nth-child(1) b{color:var(--harbour)}
+.stats .cell:nth-child(2) b{color:var(--ink)}
+.stats .cell:nth-child(3) b{color:var(--coral)}
+.stats .cell:nth-child(4) b{color:var(--sand)}
+.stats span{font-size:13px;color:var(--ink-soft);display:block;margin-top:6px;line-height:${stats_span_lh}}
+@media(max-width:760px){.stats .cell{border-right:none;border-bottom:1px solid var(--line);padding-left:0}.stats .cell:last-child{border-bottom:none}}
+
+section.ch{padding:clamp(44px,7vw,90px) 0;border-top:1px solid var(--line)}
+.ch-head{display:grid;grid-template-columns:auto 1fr;gap:clamp(18px,3vw,40px);align-items:start;margin-bottom:clamp(28px,4vw,48px)}
+.ch-num{font-family:var(--serif-num);font-weight:800;font-size:clamp(40px,5vw,62px);color:transparent;-webkit-text-stroke:1.6px var(--coral);line-height:1}
+.ch-head h2{font-size:$ch_h2_size;font-weight:$ch_h2_weight;line-height:$ch_h2_lh}
+.ch-head p.sub{color:var(--ink-soft);margin-top:10px;max-width:${ch_sub_maxw};font-size:15px}
+
+/* stacked: chart on top, note below — single column, never left-right */
+.cols{display:grid;grid-template-columns:1fr;gap:clamp(8px,2vw,18px);align-items:start}
+
+.chart{margin-top:8px}
+.chart .ct{font-size:${chart_ct_size};letter-spacing:${chart_ct_ls};color:var(--harbour);font-weight:${chart_ct_weight};margin-bottom:4px${chart_ct_tt}}
+.chart .cn2{font-size:12px;color:var(--ink-soft);margin-bottom:16px}
+.bar-row{display:grid;grid-template-columns:minmax(${bar_lab_min},${bar_lab_max}) 1fr 3.8em;gap:12px;align-items:center;margin-bottom:11px}
+.bar-row .lab{font-size:${bar_lab_size};line-height:1.4;text-align:right;color:var(--ink)}
+.bar{height:20px;background:var(--paper-deep);position:relative;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--harbour);transition:width 1.2s cubic-bezier(.22,1,.36,1)}
+.bar.coral i{background:var(--coral)}
+.bar.sand i{background:var(--sand)}
+.bar.ink i{background:var(--ink)}
+.bar-row .val{font-family:var(--serif-num);font-weight:800;font-size:14px;color:var(--ink)}
+.bar-row.hl .lab{font-weight:700}
+.bar-row.hl .val{color:var(--coral)}
+.bar-row.neg .val{color:var(--coral)}
+
+.waffle{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;max-width:300px}
+.waffle i{aspect-ratio:1;background:var(--paper-deep);display:block;transition:background .5s}
+.waffle i.f1{background:var(--harbour)}
+.waffle i.f2{background:var(--sand)}
+.waffle i.f3{background:var(--coral)}
+.legend{display:flex;flex-direction:column;gap:8px;margin-top:18px;font-size:${legend_size}}
+.legend li{list-style:none;display:flex;align-items:center;gap:10px}
+.legend i{width:13px;height:13px;flex:none}
+.legend b{font-family:var(--serif-num);font-weight:800;margin-left:auto}
+
+.note{border-left:3px solid var(--coral);padding:4px 0 4px 22px;margin-top:22px;break-inside:avoid}
+.note h4{font-size:${note_h4_size};letter-spacing:${note_h4_ls};color:var(--coral);font-weight:700;margin-bottom:8px${note_h4_tt}}
+.note p{font-size:${note_p_size};color:var(--ink-soft);max-width:${note_p_maxw};break-inside:avoid}
+.note p b{color:var(--ink)}
+.note p+p{margin-top:12px}
+.note .fig{font-family:var(--serif-num);font-weight:800;font-size:clamp(26px,3vw,38px);color:var(--coral);line-height:1;margin-right:10px;vertical-align:-3px}
+.bignum,.pq,.act,.deck,.ch-head p.sub,.bar-row{break-inside:avoid}
+
+.pq{margin:clamp(40px,6vw,72px) auto;max-width:${pq_maxw};text-align:left;position:relative;padding-left:clamp(28px,5vw,56px)}
+.pq::before{content:'$pq_quote';position:absolute;left:0;top:${pq_quote_top};font-size:${pq_quote_size};color:var(--coral);font-weight:${pq_quote_weight};line-height:1}
+.pq blockquote{font-size:${pq_bq_size};font-weight:500;line-height:${pq_bq_lh}}
+.pq cite{display:block;margin-top:14px;font-style:normal;font-size:${pq_cite_size};color:var(--ink-soft);letter-spacing:${pq_cite_ls}}
+.pq cite::before{content:'$pq_cite_prefix'}
+
+.bignum{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;margin-bottom:24px}
+.bignum b{font-family:var(--serif-num);font-weight:800;font-size:clamp(56px,9vw,104px);line-height:1;color:var(--coral)}
+.bignum span{font-size:${bignum_span_size};max-width:${bignum_span_maxw};color:var(--ink-soft);line-height:${bignum_span_lh}}
+
+.acts{counter-reset:act;margin-top:10px}
+.act{display:grid;grid-template-columns:auto 1fr;gap:clamp(18px,3vw,34px);padding:30px 0;border-top:1px solid var(--line);counter-increment:act}
+.act:first-child{border-top:none}
+.act::before{content:counter(act,decimal-leading-zero);font-family:var(--serif-num);font-weight:800;font-size:30px;color:var(--sand);line-height:1.2}
+.act h3{font-size:19px;font-weight:${act_h3_weight};margin-bottom:8px}
+.act h3 em{font-style:normal;color:var(--coral)}
+.act p{font-size:${act_p_size};color:var(--ink-soft);max-width:${act_p_maxw}}
+
+footer{margin-top:clamp(50px,8vw,100px);background:var(--ink);color:#e9e2d4;padding:clamp(40px,6vw,64px) 0}
+footer .f-grid{display:grid;grid-template-columns:1fr auto;gap:32px;align-items:start}
+@media(max-width:700px){footer .f-grid{grid-template-columns:1fr}}
+footer .f-brand{font-weight:${footer_brand_weight};font-size:20px}
+footer .f-brand em{font-style:normal;color:var(--coral)}
+footer p{font-size:10px;color:#94a0a6;max-width:${footer_p_maxw};margin-top:12px;line-height:1.7}
+footer .f-tag{font-family:var(--serif-num);font-size:11px;letter-spacing:${footer_tag_ls};text-transform:uppercase;color:var(--sand)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="topbar">
+    <img class="logo" src="$logo_src" alt="$logo_alt">
+    <div class="issue">$issue</div>
+  </div>
+
+  <header class="hero">
+    <div class="kicker rv">$kicker</div>
+    <h1 class="rv">$h1</h1>
+    <p class="deck rv">$deck</p>
+    <div class="meta rv">
+$meta_cells
+    </div>
+
+    <div class="skyline rv" aria-hidden="true">
+      <svg viewBox="0 0 1000 230" xmlns="http://www.w3.org/2000/svg">
+        <!-- Welsh dragon hint (sun position) -->
+        <circle class="dragon" cx="846" cy="66" r="26" opacity=".9"/>
+        <path class="dragon" d="M866 60 q14 -6 24 2 q-10 2 -14 8 q8 0 12 6 q-12 2 -20 -2 Z" opacity=".9"/>
+        <!-- Cardiff Castle clock tower (left) -->
+        <g>
+          <rect class="fl" x="120" y="70" width="46" height="98"/>
+          <rect class="ln" x="120" y="70" width="46" height="98"/>
+          <path class="ln" d="M118 70 l25 -26 l25 26"/>
+          <circle class="ln" cx="143" cy="100" r="9"/>
+          <path class="ln" d="M120 60 v-8 M132 60 v-8 M155 60 v-8 M166 60 v-8"/>
+        </g>
+        <!-- terraced student houses (center) -->
+        <g>
+          <path class="fl" d="M210 168 v-56 l26 -22 l26 22 v56 Z"/>
+          <path class="ln" d="M210 168 v-56 l26 -22 l26 22 v56"/>
+          <path class="fl" d="M262 168 v-50 l26 -20 l26 20 v50 Z"/>
+          <path class="ln" d="M262 168 v-50 l26 -20 l26 20 v50"/>
+          <path class="fl" d="M314 168 v-58 l26 -22 l26 22 v58 Z"/>
+          <path class="ln" d="M314 168 v-58 l26 -22 l26 22 v58"/>
+          <rect class="ln" x="226" y="126" width="12" height="16"/>
+          <rect class="ln" x="278" y="130" width="12" height="16"/>
+          <rect class="ln" x="330" y="124" width="12" height="16"/>
+        </g>
+        <!-- Principality Stadium arches (right-center) -->
+        <g>
+          <path class="ln" d="M470 168 q90 -120 200 0"/>
+          <path class="ln" d="M492 168 q78 -96 156 0"/>
+          <rect class="fl" x="470" y="140" width="200" height="28"/>
+          <rect class="ln" x="470" y="140" width="200" height="28"/>
+          <line class="ln" x1="470" y1="86" x2="470" y2="140"/>
+          <line class="ln" x1="670" y1="86" x2="670" y2="140"/>
+          <line class="ln" x1="520" y1="120" x2="520" y2="140"/><line class="ln" x1="570" y1="112" x2="570" y2="140"/><line class="ln" x1="620" y1="120" x2="620" y2="140"/>
+        </g>
+        <!-- baseline + grass -->
+        <line class="ln" x1="20" y1="168" x2="980" y2="168"/>
+        <path class="grass" d="M20 190 q30 -9 60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0"/>
+        <path class="grass" d="M50 210 q30 -9 60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0" opacity=".3"/>
+      </svg>
+    </div>
+  </header>
+
+  <div class="stats rv">
+$stat_cells
+  </div>
+
+$chapters
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="f-grid">
+      <div>
+        <div class="f-brand">$footer_brand</div>
+        <p>$footer_note</p>
+      </div>
+      <div class="f-tag">$footer_tag</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const w=document.getElementById('waffle1');if(!w)return;
+  const seq=[].concat(Array(40).fill('f1'),Array(47).fill('f2'),Array(13).fill('f3'));
+  seq.forEach(c=>{const i=document.createElement('i');i.className=c;w.appendChild(i);});
+})();
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');e.target.querySelectorAll('.bar i').forEach(b=>{b.style.width=b.dataset.w+'%';});io.unobserve(e.target);}});},{threshold:.18});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
