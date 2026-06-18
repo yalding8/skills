@@ -40,12 +40,12 @@
   },
 
   "stats": [
-    { "b": "+11.7%", "span": "..." },
-    { "b": "+22.3%", "span": "..." },
-    { "b": "−2.5%", "span": "..." },
-    { "b": "#17 · 8.7%", "span": "..." }
+    { "b": "+11.7%", "span": "粗体标题", "sub": "灰色副说明（可选）" },
+    { "b": "+22.3%", "span": "...", "sub": "...", "icon": "globe" },
+    { "b": "−2.5%", "span": "...", "sub": "..." },
+    { "b": "#17 | 8.7%", "span": "...", "sub": "...", "tone": "neg", "icon": "bars" }
   ],
-  "__stats": "the headline stat cards (brand review 2026-06-18: light cards — soft fill, rounded, hairline border; NOT a heavy segmented box). Exactly 4 cells. Colour is SEMANTIC by sign: a leading + → growth green, a leading − → decline red, UNSIGNED → neutral ink (the old positional rainbow was removed). Add \"tone\":\"pos\"|\"neg\"|\"neutral\" to override. Don't put a signed delta in the same strip as a bare ratio like \"7 / 8\" — rewrite the ratio as a big count (\"7\") with the denominator in the span (\"of the top-8 …\").",
+  "__stats": "the headline stat CARDS (brand review 2026-06-18, designer mockup): each card = a coloured circular ICON BADGE + big semantic number + bold title (span) + muted subtitle (sub). Exactly 4. Colour is SEMANTIC by sign: leading + → growth green (↑ badge), leading − → decline red (↓ badge), UNSIGNED → neutral ink (bars badge). Override colour with \"tone\":\"pos\"|\"neg\"|\"neutral\" (e.g. a bad rank like #17 → \"neg\" to make it red). Override the glyph with \"icon\":\"up\"|\"down\"|\"bars\"|\"globe\"|\"flat\". \"sub\" is the optional second caption line. A trailing % in b is auto-shrunk. Don't mix a signed delta with a bare ratio (\"7 / 8\") in the strip — rewrite as a big count.",
 
   "chapters": [
     {

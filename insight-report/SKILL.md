@@ -112,10 +112,11 @@ python3 ~/.claude/skills/insight-report/scripts/preflight.py report.config.json
   atomic across pages. The stat strip is now **light cards** (soft white fill, rounded, hairline
   border) — this replaced the earlier "no boxes" rule; the *heavy 2px segmented* box is still banned
   (it broke across pages), the light card is approved. See REFERENCE.md §Design rules.
-- **Stat cards = semantic colour by sign (auto).** `+`→`--up` green, `−`→`--down` red, unsigned→
-  neutral ink (NO positional rainbow). Override with `"tone"`. Don't mix a signed delta with a bare
-  ratio (`"7 / 8"`) — rewrite as big count `"7"` + denominator in the span. Leading +/− auto-balanced
-  via `.sgn`. See REFERENCE §Design rules 6–7.
+- **Stat cards = icon badge + semantic colour (designer mockup).** Each card has a coloured circular
+  **icon badge** (auto: `+`→green ↑, `−`→red ↓, unsigned→grey bars; override `"icon":"up|down|bars|globe|flat"`),
+  a big number (`+`→`--up` green / `−`→`--down` red / unsigned→ink; override `"tone":"pos|neg|neutral"` —
+  e.g. a bad rank `#17`→`"neg"` for red), a bold title (`span`) and a muted subtitle (`sub`). Trailing
+  `%` auto-shrinks. Don't mix a signed delta with a bare ratio (`"7 / 8"`). See REFERENCE §Design rules 6–7.
 - **Chart variants (pick the form that fits the question).** `variant`: `"line"` (trend over time),
   `"donut"` (share/proportion, highlight one slice), `"column"` (vertical bars, time comparison,
   grey + 1 highlight), default `"bar"` (horizontal); add `"diverging":true` to a bar chart so

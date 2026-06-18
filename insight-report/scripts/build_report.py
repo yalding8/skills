@@ -647,6 +647,19 @@ def render_meta_cells(meta):
     return "\n".join(out)
 
 
+# Stat-card badge icons (brand review 2026-06-18 — the designer's card mockup uses a coloured
+# circular icon badge). White glyphs on the tone-coloured circle; pick by `icon` or auto by sign.
+STAT_ICONS = {
+    "up":    '<path d="M12 4.5l6.5 7.5h-4v8h-5v-8h-4z"/>',
+    "down":  '<path d="M12 19.5l-6.5-7.5h4v-8h5v8h4z"/>',
+    "bars":  '<path d="M4 13.5h4V20H4zM10 8h4v12h-4zM16 4h4v16h-4z"/>',
+    "globe": ('<g fill="none" stroke="#fff" stroke-width="1.8">'
+              '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/>'
+              '<path d="M12 3.5c3.2 2.6 3.2 14.4 0 17c-3.2-2.6-3.2-14.4 0-17z"/></g>'),
+    "flat":  '<path d="M5 11h14v2H5z"/>',
+}
+
+
 def render_stat_cells(stats):
     out = []
     for s in stats:
@@ -655,28 +668,41 @@ def render_stat_cells(stats):
         first = b.lstrip()[:1]
         is_sign = first in ("+", "−", "-")
         if tone is None:
-            # auto by sign: leading + → rise(green), leading − / - → fall(red),
-            # otherwise no class → falls back to the positional nth-child color.
+            # auto by sign: leading + → rise (green), leading − / - → fall (red),
+            # unsigned → neutral (ink number, grey badge). Override with "tone".
             if first == "+":
                 tone = "pos"
             elif first in ("−", "-"):
                 tone = "neg"
             else:
-                tone = ""
-        cls = ' class="%s"' % tone if tone else ""
-        # tone also goes on the CARD so its top accent rule + number colour match
+                tone = "neutral"
+        cls = ' class="%s"' % tone if tone in ("pos", "neg", "neutral") else ""
         cellcls = "cell" + ((" " + tone) if tone else "")
-        # Wrap a leading +/− in <span class="sgn">: Montserrat draws U+2212 as a wide
-        # bar that visually outweighs the compact +, so render the sign as a small,
-        # raised affix to balance the pair. Unsigned numbers are emitted as-is.
+
+        # icon badge: explicit "icon" wins, else auto by tone (pos→up, neg→down, neutral→bars)
+        icon = s.get("icon") or {"pos": "up", "neg": "down", "neutral": "bars"}.get(tone, "bars")
+        badge = ('<span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true">%s</svg></span>'
+                 % STAT_ICONS.get(icon, STAT_ICONS["bars"]))
+
+        # Wrap a leading +/− in <span class="sgn"> (Montserrat's U+2212 is a wide bar that
+        # outweighs the compact +); shrink a trailing % into <span class="u">.
         if is_sign:
             stripped = b.lstrip()
-            lead = b[:len(b) - len(stripped)]  # preserve rare leading whitespace
+            lead = b[:len(b) - len(stripped)]
             disp = '%s<span class="sgn">%s</span>%s' % (lead, stripped[0], stripped[1:])
         else:
             disp = b
-        out.append('    <div class="%s"><b%s>%s</b><span>%s</span></div>'
-                   % (cellcls, cls, disp, s["span"]))
+        if disp.rstrip().endswith("%"):
+            i = disp.rstrip().rfind("%")
+            disp = disp[:i] + '<span class="u">%</span>' + disp[i + 1:]
+
+        # caption: bold title (span) + optional muted subtitle (sub)
+        cap = '<div class="cap">%s</div>' % s["span"]
+        if s.get("sub"):
+            cap += '<div class="sub">%s</div>' % s["sub"]
+
+        out.append('    <div class="%s">%s<b%s>%s</b>%s</div>'
+                   % (cellcls, badge, cls, disp, cap))
     return "\n".join(out)
 
 

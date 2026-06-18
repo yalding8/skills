@@ -77,22 +77,27 @@ body{font-family:var(--cn);background:var(--paper);color:var(--ink);line-height:
 /* light cards (brand review 2026-06-18): each stat is its own card — soft white fill,
    rounded, hairline border. This is the *light* card the brand approved, NOT the old heavy
    2px segmented box that broke across pages. Colour is SEMANTIC only: +green / −red / neutral ink. */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:clamp(36px,6vw,64px) 0}
-/* defined card: white fill, rounded, soft elevation shadow, and a 3px semantic top accent
-   (green=growth / red=decline / grey=neutral) so cards read unmistakably AND signal the sign */
-.stats .cell{padding:22px 20px 18px;background:#fff;border:1px solid var(--line);border-top:3px solid var(--data);border-radius:12px;box-shadow:0 3px 14px rgba(28,43,51,.08);break-inside:avoid}
-.stats .cell.pos{border-top-color:var(--up)}
-.stats .cell.neg{border-top-color:var(--down)}
-.stats .cell.neutral{border-top-color:var(--data)}
-.stats b{font-family:var(--serif-num);font-weight:800;font-size:clamp(26px,3.2vw,40px);display:block;line-height:1.1;color:var(--ink)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin:clamp(36px,6vw,64px) 0}
+/* icon-badge cards (brand review 2026-06-18, matches the designer mockup): white card + soft
+   elevation; a coloured circular ICON BADGE (green ↑ growth / red ↓ decline / grey neutral);
+   big semantic number (with a shrunk % unit); then a bold title + a muted subtitle. */
+.stats .cell{padding:22px 22px 20px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 3px 14px rgba(28,43,51,.07);break-inside:avoid}
+.stats .ic{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:16px;background:var(--data)}
+.stats .cell.pos .ic{background:var(--up)}
+.stats .cell.neg .ic{background:var(--down)}
+.stats .cell.neutral .ic{background:var(--data)}
+.stats .ic svg{width:21px;height:21px;fill:#fff;display:block}
+.stats b{font-family:var(--serif-num);font-weight:800;font-size:clamp(27px,3.3vw,40px);display:block;line-height:1.05;color:var(--ink)}
+.stats b .u{font-size:.6em;font-weight:700;margin-left:.04em}  /* shrunk % / unit */
 /* leading +/− rendered as a balanced small affix (Montserrat's U+2212 is a wide bar that otherwise outweighs the compact +) */
 .stats b .sgn{display:inline-block;font-size:.66em;transform:translateY(-0.13em);margin-right:.02em;font-weight:800}
-.stats b.neg .sgn{font-size:.5em;transform:translateY(-0.42em);margin-right:.06em} /* U+2212 is much wider than +, so the minus needs a deeper shrink + raise to match */
-/* semantic sign colour: + rise = growth green, − fall = decline red; unsigned stays neutral ink */
-.stats .cell b.pos{color:var(--up)}
-.stats .cell b.neg{color:var(--down)}
-.stats .cell b.neutral{color:var(--ink)}
-.stats span{font-size:13px;color:var(--ink-soft);display:block;margin-top:6px;line-height:${stats_span_lh}}
+.stats b.neg .sgn{font-size:.5em;transform:translateY(-0.42em);margin-right:.06em}
+/* semantic colour: + rise = growth green, − fall = decline red; unsigned stays neutral ink */
+.stats .cell.pos b{color:var(--up)}
+.stats .cell.neg b{color:var(--down)}
+.stats .cell.neutral b{color:var(--ink)}
+.stats .cap{font-size:13px;font-weight:700;color:var(--ink);margin-top:14px;line-height:1.4}
+.stats .sub{font-size:12px;color:var(--ink-soft);margin-top:4px;line-height:1.45}
 @media(max-width:760px){.stats{grid-template-columns:1fr 1fr}}
 
 section.ch{padding:clamp(44px,7vw,90px) 0;border-top:1px solid var(--line)}
