@@ -29,6 +29,7 @@ import urllib.request
 
 import websockets
 
+SKILL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 PORT = 9334  # distinct from build_pdf's 9333 so both can run
 
@@ -199,6 +200,10 @@ def main():
     watermark = cfg.get("watermark", "Pro.uhomes.com")
     width = int(cfg.get("width", 1200))
     scale = int(cfg.get("scale", 2))
+    wm_logo_path = cfg.get("watermark_logo")
+    wm_logo_path = os.path.join(base, wm_logo_path) if wm_logo_path else \
+        os.path.join(SKILL_DIR, "assets", "uhomes-logo-red.svg")
+    wm_logo_uri = data_uri_svg(wm_logo_path)
 
     jobs, tmps = [], []
     for r in cfg["reports"]:
@@ -206,7 +211,7 @@ def main():
         stem = os.path.splitext(os.path.basename(r["src"]))[0]
         out_png = os.path.join(base, r.get("long", stem + "-long.png"))
         out_pdf = os.path.join(base, r.get("longpdf", stem + "-long.pdf"))
-        tmp, url = prepare(src, watermark)
+        tmp, url = prepare(src, watermark, wm_logo_uri)
         tmps.append(tmp)
         jobs.append((out_png, out_pdf, url))
     try:

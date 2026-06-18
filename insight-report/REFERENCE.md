@@ -122,8 +122,9 @@ the stacked/de-boxed redesign.)
 
 ```json
 {
-  "watermark": "Pro.uhomes.com",          // "" to disable
-  "logo": "assets/uhomes-logo-red.svg",    // optional; default = skill's bundled red wordmark
+  "watermark": "Pro.uhomes.com",          // "" to disable; tiled diagonal text
+  "logo": "assets/uhomes-logo-red.svg",    // optional; footer corner mark; default = skill's red wordmark
+  "watermark_logo": "assets/uhomes-logo-red.svg", // optional; EN watermark logo; default = uhomes.com wordmark
   "reports": [
     { "src": "report-cn.html", "out": "Report-CN.pdf", "title": "<header left>", "brand": "<header right>" }
   ]
@@ -132,6 +133,14 @@ the stacked/de-boxed redesign.)
 
 Paths resolve relative to the config file's directory. Run:
 `python3 <skill>/scripts/build_pdf.py report.config.json`
+
+**Watermark is language-aware** (brand request 2026-06, both `build_pdf.py` and `build_longimage.py`):
+- **EN report** (`<html lang="en">`) → tile = the **uhomes.com English wordmark** (`watermark_logo`,
+  faint ~8.5% opacity) **above** the `watermark` url text — i.e. "English logo + pro.uhomes.com".
+- **CN report** (any non-`en` lang) → tile = **text-only** (`watermark` string), no logo.
+
+Detection is automatic from the HTML `lang` attr; no per-report config needed. Override the watermark
+logo via the top-level `watermark_logo` key.
 
 ### Why it's built this way (do not "simplify" these away)
 

@@ -104,6 +104,9 @@ python3 ~/.claude/skills/insight-report/scripts/preflight.py report.config.json
   **3-brand combined logo 异乡好居 ｜ 异乡缴费 ｜ 异乡人才** (`uhomes-cn-combined-logo.svg`).
   `build_report.py` picks this from `lang` — leave `content.topbar` as just `issue`. Override per
   report-type (university/apartment) via `content.topbar.logo_src`. See REFERENCE.md §Logo strategy.
+- **Watermark by language (auto)**: EN report → faint **uhomes.com wordmark + `watermark` url text**
+  tiled; CN report → **text-only** tile. Both build scripts detect `lang` from the HTML. See
+  REFERENCE.md §PDF pipeline config schema.
 - Pre-register before results; show raw data before conclusions; annotate AI-estimated numbers.
 - Archive the report as `docs/ANALYSIS_YYYY-MM-DD_<topic>.md` and update the README index.
 
