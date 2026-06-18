@@ -48,9 +48,28 @@ Per-row keys:
     value       (number)          the datum; drives math + default printed text
     value_text  (str, optional)   override the printed value cell (e.g. "+22%", "2.0万")
     w           (number, optional) explicit data-w; required for mode raw_w
-    style       (str, optional)   "" | "coral" | "sand" | "ink"  → bar color class
-    hl          (bool, optional)  highlight row (bold label, coral value)
-    neg         (bool, optional)  force neg styling (width 0, coral val)
+    hl          (bool, optional)  THE highlighted row — brand-colour fill (#FF5A5F),
+                                  bold label. Use for the subject (Cardiff / UK). One per chart.
+    up          (bool, optional)  growth-green fill (positive emphasis)
+    neg         (bool, optional)  decline: red value; width 0 (normal bars) or left-extending
+                                  (diverging bars). Auto when value < 0.
+    style       (str, optional)   DEPRECATED legacy bar class "coral"|"sand"|"ink".
+                                  Don't use in new content — default is neutral grey; opt in
+                                  with hl/up/neg. (Brand review 2026-06-18: 4-colour system —
+                                  brand / growth-green / decline-red / neutral-grey ONLY.)
+
+----------------------------------------------------------------------------------------
+CHART VARIANTS  ("variant" on a chart block; default "bar")
+----------------------------------------------------------------------------------------
+  "bar"     (default)  horizontal bars (mode scale/percent/raw_w as above).
+            Add "diverging": true to render signed data around a centre zero-axis
+            (positive right / negative LEFT in decline-red) — use when negatives must SHOW.
+  "column"  vertical columns (time comparison). bars:[{label,value,hl?/up?/down?}].
+            Default grey, highlight ONE with hl. "scale" caps the tallest (default 92).
+  "line"    trend line over time. bars:[{label,value,hl?/down?,value_text?}] (treated as
+            ordered points). Marks each point; hl point = brand, down point = red.
+  "donut"   share/proportion. bars:[{label,value,hl?,value_text?}]; highlighted slice =
+            brand, rest = neutral greys. Optional "center":{value,label} in the hole.
 
 ----------------------------------------------------------------------------------------
 CONTENT JSON SHAPE  (see templates/content.example.json for an annotated copy)
@@ -125,6 +144,7 @@ PRESET_CN = {
     "bar_lab_min": "96px",
     "bar_lab_max": "9em",
     "bar_lab_size": "13.5px",
+    "col_h": "230px",
     "legend_size": "13.5px",
     "note_h4_size": "14px",
     "note_h4_ls": ".18em",
@@ -180,6 +200,7 @@ PRESET_EN = {
     "bar_lab_min": "110px",
     "bar_lab_max": "11em",
     "bar_lab_size": "13px",
+    "col_h": "240px",
     "legend_size": "13px",
     "note_h4_size": "13px",
     "note_h4_ls": ".14em",
@@ -259,6 +280,7 @@ def render_bars(chart):
         explicit_w = b.get("w")
         bstyle = b.get("style", "")
         hl = b.get("hl", False)
+        up_flag = b.get("up", False)
         neg_flag = b.get("neg", False)
 
         neg = neg_flag or is_negative(value, explicit_w)
@@ -306,9 +328,18 @@ def render_bars(chart):
         cls = ["bar-row"]
         if hl:
             cls.append("hl")
+        if up_flag:
+            cls.append("up")
         if neg:
             cls.append("neg")
+        # bar fill class drives colour: default (no class) = neutral grey;
+        # hl = brand highlight, up = growth green (decline is zeroed-width here, so its
+        # fill is moot — the red value cell carries the signal via .bar-row.neg)
         barcls = "bar"
+        if hl:
+            barcls += " hl"
+        elif up_flag:
+            barcls += " up"
         if bstyle:
             barcls += " " + bstyle
 
@@ -321,16 +352,206 @@ def render_bars(chart):
     return "\n".join(rows)
 
 
+def render_diverging_bars(chart):
+    """Signed horizontal bars around a centre zero-axis: positive extends right (neutral
+    grey / brand if hl), negative extends LEFT in decline-red. Use for YoY where some
+    values are negative and must be SHOWN (not zeroed). Width is half-track relative
+    (max ~47% of the full bar, leaving a margin), scaled by max(|value|)."""
+    bars = chart["bars"]
+    scale = chart.get("scale", 47)
+    vals = [abs(float(b["value"])) for b in bars if b.get("value") is not None]
+    mx = max(vals) if vals else 1.0
+    rows = []
+    for b in bars:
+        label = b["label"]
+        value = b.get("value")
+        value_text = b.get("value_text")
+        hl = b.get("hl", False)
+        v = float(value) if value is not None else 0.0
+        neg = (v < 0) or b.get("neg", False)
+        w = (abs(v) / mx * scale) if mx else 0.0
+        vtxt = value_text if value_text is not None else fmt_w(value)
+        cls = ["bar-row", "div"]
+        if hl:
+            cls.append("hl")
+        elif b.get("up"):
+            cls.append("up")
+        if neg:
+            cls.append("neg")
+        barcls = "bar div"
+        if hl:
+            barcls += " hl"
+        elif b.get("up"):
+            barcls += " up"
+        icls = ' class="neg"' if neg else ""
+        rows.append(
+            '        <div class="%s"><span class="lab">%s</span>'
+            '<span class="%s"><span class="track left"></span><span class="track"></span>'
+            '<i%s data-w="%.1f"></i></span>'
+            '<b class="val">%s</b></div>'
+            % (" ".join(cls), label, barcls, icls, w, vtxt)
+        )
+    return "\n".join(rows)
+
+
+def render_column(chart):
+    """Vertical columns (time comparison). Default fill = neutral grey; opt-in hl=brand /
+    up=green / down=red. Heights scaled to max positive value."""
+    bars = chart["bars"]
+    scale = chart.get("scale", 92)
+    vals = [float(b["value"]) for b in bars
+            if b.get("value") is not None and float(b["value"]) > 0]
+    mx = max(vals) if vals else 1.0
+    cols = []
+    for b in bars:
+        label = b["label"]
+        value = b.get("value")
+        value_text = b.get("value_text")
+        v = float(value) if value is not None else 0.0
+        h = (v / mx * scale) if v > 0 else 0.0
+        vtxt = value_text if value_text is not None else fmt_w(value)
+        cls = ["col"]
+        if b.get("hl"):
+            cls.append("hl")
+        elif b.get("down") or v < 0:
+            cls.append("down")
+        elif b.get("up"):
+            cls.append("up")
+        cols.append(
+            '          <div class="%s"><span class="colval">%s</span>'
+            '<i data-h="%.1f"></i><span class="collab">%s</span></div>'
+            % (" ".join(cls), vtxt, h, label)
+        )
+    return '        <div class="col-chart">\n%s\n        </div>' % "\n".join(cols)
+
+
+def render_line(chart):
+    """Trend line (one metric over time). Neutral ink line + faint brand area; each point a
+    dot (neutral; hl=brand, down=red). Static SVG (renders 1:1 in print; the .rv wrapper
+    still fades it in on screen)."""
+    pts = chart["bars"]
+    if not pts:
+        return '        <div class="linechart"></div>'
+    vals = [float(p["value"]) for p in pts]
+    mx, mn = max(vals), min(vals)
+    span = (mx - mn) if mx > mn else 1.0
+    W, H = 760.0, 300.0
+    padL = padR = 20.0
+    padT, padB = 36.0, 36.0
+    n = len(pts)
+    yb = H - padB
+
+    def X(i):
+        return padL + (W - padL - padR) * (i / (n - 1) if n > 1 else 0.5)
+
+    def Y(v):
+        return padT + (H - padT - padB) * (1 - (v - mn) / span)
+
+    coords = [(X(i), Y(float(p["value"]))) for i, p in enumerate(pts)]
+    line_d = "M" + " L".join("%.1f %.1f" % (x, y) for x, y in coords)
+    area_d = ("M%.1f %.1f " % (coords[0][0], yb)
+              + "".join("L%.1f %.1f " % (x, y) for x, y in coords)
+              + "L%.1f %.1f Z" % (coords[-1][0], yb))
+
+    svg = ['      <div class="linechart">',
+           '        <svg viewBox="0 0 %g %g" preserveAspectRatio="xMidYMid meet" '
+           'xmlns="http://www.w3.org/2000/svg">' % (W, H),
+           '          <line class="lc-base" x1="%.1f" y1="%.1f" x2="%.1f" y2="%.1f"/>'
+           % (padL, yb, W - padR, yb),
+           '          <path class="lc-area" d="%s"/>' % area_d,
+           '          <path class="lc-line" d="%s"/>' % line_d]
+    for i, p in enumerate(pts):
+        x, y = coords[i]
+        tone = "hl" if p.get("hl") else ("down" if p.get("down") else ("up" if p.get("up") else ""))
+        dotcls = "lc-dot" + ((" " + tone) if tone else "")
+        valcls = "lc-val" + ((" " + tone) if tone else "")
+        vtxt = p.get("value_text", fmt_w(p.get("value")))
+        vy = y - 12 if y > padT + 16 else y + 22
+        svg.append('          <circle class="%s" cx="%.1f" cy="%.1f" r="4.5"/>' % (dotcls, x, y))
+        svg.append('          <text class="%s" x="%.1f" y="%.1f">%s</text>' % (valcls, x, vy, vtxt))
+        svg.append('          <text class="lc-lab" x="%.1f" y="%.1f">%s</text>'
+                   % (x, yb + 20, p["label"]))
+    svg.append('        </svg>')
+    svg.append('      </div>')
+    return "\n".join(svg)
+
+
+def render_donut(chart):
+    """Share / proportion donut. The highlighted slice = brand; the rest = neutral greys.
+    Optional center={value,label}. Legend lists every slice with its value."""
+    slices = chart["bars"]
+    total = sum(float(s["value"]) for s in slices) or 1.0
+    cx = cy = 80.0
+    r = 58.0
+    sw = 26.0
+    import math
+    C = 2 * math.pi * r
+    greys = ["var(--data)", "var(--data-soft)", "var(--ink-soft)"]
+    acc = 0.0
+    arcs = []
+    legend = []
+    gi = 0
+    for s in slices:
+        v = float(s["value"])
+        frac = v / total
+        seg = frac * C
+        if s.get("hl"):
+            color = "var(--brand)"
+        elif s.get("down"):
+            color = "var(--down)"
+        elif s.get("up"):
+            color = "var(--up)"
+        else:
+            color = greys[gi % len(greys)]
+            gi += 1
+        arcs.append(
+            '          <circle cx="%g" cy="%g" r="%g" fill="none" stroke="%s" '
+            'stroke-width="%g" stroke-dasharray="%.2f %.2f" stroke-dashoffset="%.2f" '
+            'transform="rotate(-90 %g %g)"/>'
+            % (cx, cy, r, color, sw, seg, C - seg, -acc, cx, cy))
+        acc += seg
+        vtxt = s.get("value_text", "%s%%" % fmt_w(v))
+        legend.append(
+            '          <li><i style="background:%s"></i>'
+            '<span class="dn-lab">%s</span><b>%s</b></li>' % (color, s["label"], vtxt))
+
+    center = chart.get("center")
+    center_svg = ""
+    if center:
+        center_svg = (
+            '          <text class="dn-center-v" x="%g" y="%g">%s</text>'
+            '          <text class="dn-center-l" x="%g" y="%g">%s</text>'
+            % (cx, cy + 2, center.get("value", ""), cx, cy + 20, center.get("label", "")))
+
+    return (
+        '      <div class="donut-chart">\n'
+        '        <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">\n'
+        '%s\n%s        </svg>\n'
+        '        <ul class="donut-legend">\n%s\n        </ul>\n'
+        '      </div>'
+        % ("\n".join(arcs), (center_svg + "\n") if center_svg else "", "\n".join(legend)))
+
+
 def render_chart(block):
     ct = block.get("ct", "")
     cn2 = block.get("cn2", "")
-    rows = render_bars(block)
+    variant = block.get("variant", "bar")
+    if variant == "column":
+        body = render_column(block)
+    elif variant == "line":
+        body = render_line(block)
+    elif variant in ("donut", "pie"):
+        body = render_donut(block)
+    elif block.get("diverging"):
+        body = render_diverging_bars(block)
+    else:
+        body = render_bars(block)
     parts = ['      <div class="chart rv">']
     if ct:
         parts.append('        <div class="ct">%s</div>' % ct)
     if cn2:
         parts.append('        <div class="cn2">%s</div>' % cn2)
-    parts.append(rows)
+    parts.append(body)
     parts.append("      </div>")
     return "\n".join(parts)
 

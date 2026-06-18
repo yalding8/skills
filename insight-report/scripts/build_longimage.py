@@ -85,7 +85,7 @@ def inject(html, watermark_text, wm_logo_uri=None):
     head = (
         "<style id='long-overrides'>"
         ".rv{opacity:1 !important;transform:none !important;transition:none !important}"
-        ".bar i{transition:none !important}"
+        ".bar i,.col i{transition:none !important}"
         ".masthead{display:none !important}"
         f"{wm_css}</style>"
     )
@@ -94,6 +94,8 @@ def inject(html, watermark_text, wm_logo_uri=None):
         "document.querySelectorAll('.rv').forEach(function(e){e.classList.add('on');});"
         "document.querySelectorAll('.bar i').forEach(function(b){"
         "if(b.dataset&&b.dataset.w){b.style.width=b.dataset.w+'%';}});"
+        "document.querySelectorAll('.col i').forEach(function(b){"
+        "if(b.dataset&&b.dataset.h){b.style.height=b.dataset.h+'%';}});"
         "window.addEventListener('load',function(){var w=document.getElementById('wm-long');"
         "if(w){w.style.height=document.documentElement.scrollHeight+'px';}});"
         "</script>"
