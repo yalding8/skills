@@ -31,8 +31,10 @@ Produces a uhomes-branded insight report across five stages. Stages 1–3 are me
    reveal blocks; `.bar i[data-w]` bars; `section.ch`/`.ch-head`/`.cols`/`.stats`/`.pq`). See
    REFERENCE.md §Templated authoring + §HTML render contract. (Bar widths come from the helper —
    never hand-compute `data-w`; give raw values, see REFERENCE §Bar helper.)
-5. **自检 + 输出 (Preflight + Export)** — decide the output form FIRST (default 长版本 for
-   external sharing; A4 only for formal print), then build, then **gate on preflight**:
+5. **自检 + 输出 (Preflight + Export)** — FIRST put this report in its **own dedicated output folder**
+   (one report = one folder; never co-mingle with other reports' files — see §Conventions), THEN decide
+   the output form (default 长版本 for external sharing; A4 only for formal print), then build, then
+   **gate on preflight**:
 
    - **长版本 / continuous** (DEFAULT — one tall page, NO A4 pagination/header/footer/whitespace):
      ```bash
@@ -119,6 +121,15 @@ python3 ~/.claude/skills/insight-report/scripts/preflight.py report.config.json
   tiled; CN report → **text-only** tile. Both build scripts detect `lang` from the HTML. See
   REFERENCE.md §PDF pipeline config schema.
 - Pre-register before results; show raw data before conclusions; annotate AI-estimated numbers.
+- **One report = one dedicated output folder (NEVER mix with other reports).** Before Stage 4,
+  create a fresh folder named for this report (e.g. `<topic>-报告/` or `report-<topic>-YYYY-MM/`) and
+  write EVERYTHING into it: `content.<lang>.json`, the generated `.html`, `report.config.json`, and all
+  build outputs (`*-long.png/pdf`, A4 `*.pdf`). Run the build/preflight scripts from inside that folder
+  (config paths are relative). Do NOT drop new files alongside a previous report's files in a shared
+  directory — co-mingling makes `report.config.json` ambiguous, lets `build_*`/`preflight` pick up stale
+  siblings, and makes handoff a guessing game. If asked to extend an existing report set, still give the
+  new report its own subfolder. The archive `ANALYSIS_*.md` (below) is the only file that may live in the
+  shared `docs/`.
 - Archive the report as `docs/ANALYSIS_YYYY-MM-DD_<topic>.md` and update the README index.
 
 See **[REFERENCE.md](REFERENCE.md)** for the render contract, pre-registration template, cohort
