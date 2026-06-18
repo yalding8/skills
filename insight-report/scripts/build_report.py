@@ -431,10 +431,11 @@ def render_stat_cells(stats):
     for s in stats:
         b = s["b"]
         tone = s.get("tone")  # optional explicit override: "pos" | "neg" | "neutral"
+        first = b.lstrip()[:1]
+        is_sign = first in ("+", "−", "-")
         if tone is None:
             # auto by sign: leading + → rise(green), leading − / - → fall(red),
             # otherwise no class → falls back to the positional nth-child color.
-            first = b.lstrip()[:1]
             if first == "+":
                 tone = "pos"
             elif first in ("−", "-"):
@@ -442,7 +443,16 @@ def render_stat_cells(stats):
             else:
                 tone = ""
         cls = ' class="%s"' % tone if tone else ""
-        out.append('    <div class="cell"><b%s>%s</b><span>%s</span></div>' % (cls, b, s["span"]))
+        # Wrap a leading +/− in <span class="sgn">: Montserrat draws U+2212 as a wide
+        # bar that visually outweighs the compact +, so render the sign as a small,
+        # raised affix to balance the pair. Unsigned numbers are emitted as-is.
+        if is_sign:
+            stripped = b.lstrip()
+            lead = b[:len(b) - len(stripped)]  # preserve rare leading whitespace
+            disp = '%s<span class="sgn">%s</span>%s' % (lead, stripped[0], stripped[1:])
+        else:
+            disp = b
+        out.append('    <div class="cell"><b%s>%s</b><span>%s</span></div>' % (cls, disp, s["span"]))
     return "\n".join(out)
 
 

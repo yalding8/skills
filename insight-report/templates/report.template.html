@@ -68,6 +68,8 @@ body{font-family:var(--cn);background:var(--paper);color:var(--ink);line-height:
 .stats .cell{padding:24px 22px 22px 0;border-right:1px solid var(--line);break-inside:avoid}
 .stats .cell:last-child{border-right:none}
 .stats b{font-family:var(--serif-num);font-weight:800;font-size:clamp(28px,3.4vw,42px);display:block;line-height:1.1}
+/* leading +/− rendered as a balanced small affix (Montserrat's U+2212 is a wide bar that otherwise outweighs the compact +) */
+.stats b .sgn{display:inline-block;font-size:.66em;transform:translateY(-0.13em);margin-right:.02em;font-weight:800}
 .stats .cell:nth-child(1) b{color:var(--harbour)}
 .stats .cell:nth-child(2) b{color:var(--ink)}
 .stats .cell:nth-child(3) b{color:var(--coral)}
