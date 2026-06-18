@@ -63,7 +63,7 @@ CONTENT JSON SHAPE  (see templates/content.example.json for an annotated copy)
   "topbar": { logo_src, logo_alt, issue (may contain <br>) },
   "hero": { kicker, h1 (may contain <br>/<span class=accent>), deck,
             meta: [ {b, span}, x4 ] },
-  "stats": [ {b, span} x4 ],
+  "stats": [ {b, span, tone?} x4 ],   # tone: "pos"|"neg"|"neutral" override; default auto by +/− sign of b (unsigned keeps positional color)
   "chapters": [
      { "num": "01", "h2": "...", "sub": "...",
        "blocks": [ <block>, ... ],
@@ -429,7 +429,20 @@ def render_meta_cells(meta):
 def render_stat_cells(stats):
     out = []
     for s in stats:
-        out.append('    <div class="cell"><b>%s</b><span>%s</span></div>' % (s["b"], s["span"]))
+        b = s["b"]
+        tone = s.get("tone")  # optional explicit override: "pos" | "neg" | "neutral"
+        if tone is None:
+            # auto by sign: leading + → rise(green), leading − / - → fall(red),
+            # otherwise no class → falls back to the positional nth-child color.
+            first = b.lstrip()[:1]
+            if first == "+":
+                tone = "pos"
+            elif first in ("−", "-"):
+                tone = "neg"
+            else:
+                tone = ""
+        cls = ' class="%s"' % tone if tone else ""
+        out.append('    <div class="cell"><b%s>%s</b><span>%s</span></div>' % (cls, b, s["span"]))
     return "\n".join(out)
 
 

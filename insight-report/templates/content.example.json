@@ -45,7 +45,7 @@
     { "b": "−2.5%", "span": "..." },
     { "b": "#17 · 8.7%", "span": "..." }
   ],
-  "__stats": "the headline stat strip (inv 2: hairline top/bottom rules, thin dividers, NO box). Exactly 4 cells; colors are auto: green / ink / coral / sand by position.",
+  "__stats": "the headline stat strip (inv 2: hairline top/bottom rules, thin dividers, NO box). Exactly 4 cells. Color is SEMANTIC by sign: a leading + → green(rise), a leading − → red(fall); UNSIGNED numbers fall back to the positional palette (green / ink / coral / sand by position). Add \"tone\":\"pos\"|\"neg\"|\"neutral\" to a cell to override. Don't put a signed delta in the same strip as a bare ratio like \"7 / 8\" — rewrite the ratio as a big count (\"7\") with the denominator in the span (\"of the top-8 …\") to avoid fraction ambiguity.",
 
   "chapters": [
     {
