@@ -26,10 +26,40 @@ the crossing range, not a single point estimate.
 - **Credibility note**: AI "multi-agent review" ≠ independent expert cross-check; same model shares
   blind spots. Put a credibility disclaimer at the top of AI-generated reports.
 
-## HTML render contract (Stage 4)
+## Templated authoring (Stage 4)
 
-The PDF script (`scripts/build_pdf.py`) injects overrides + a reveal-forcing script that depend on
-these hooks. The HTML **must** use them or the static PDF renders blank/animated-out:
+The report is NOT two hand-maintained HTML files. Layout lives in one shared template; content/data
+live in per-language JSON. This kills the "edit the same fix twice in CN and EN" error class.
+
+**Three steps:**
+1. **Edit `content.<lang>.json`** (text, chart values, chapters). `lang: "cn"|"en"` selects the whole
+   typographic preset (CN=阿里普惠体, EN=Montserrat) — no CSS edits.
+2. **Generate**: `python3 scripts/build_report.py content.cn.json` (EN likewise). The renderer reads
+   `templates/report.template.html` + the built-in CN/EN presets and emits HTML 1:1 with the design.
+3. **Export**: `build_longimage.py` (长图/长 PDF, default) or `build_pdf.py` (A4) as usual.
+
+Change layout → edit `templates/report.template.html` or a preset once, both languages benefit.
+Change copy/data → edit only the relevant `content.<lang>.json`. Output name = JSON `output` key (or `-o`).
+Starter: `templates/content.example.json` (delete its `__*` comment keys in a real file).
+
+### Bar helper (never hand-compute `data-w`)
+
+Each chart carries `"bars": [...]`; each row `{label, value, ...}`. The helper computes bar widths:
+
+- `mode: "scale"` (default) — `data-w = value / max * scale` (scale default 95); for raw magnitudes
+  (deal counts etc.), tallest bar ≈95% wide.
+- `mode: "percent"` — `data-w = value`, prints `N%`; for shares that sum to 100 (progress bars).
+- `mode: "raw_w"` — you give `w` + `value_text`; helper does no math; for YoY charts where bar length
+  is a hand-tuned visual code decoupled from the printed % (country / peer-city exhibits).
+- Row keys: `label`(req) / `value` / `value_text`(override printed value, e.g. `+22%`) / `w`(explicit
+  width) / `style`(`""|coral|sand|ink`) / `hl`(highlight row) / `neg`(force negative style).
+  **Any value<0 or w<0 → width 0, value printed red `.neg`, minus sign kept.**
+
+## HTML render contract (Stage 4 output)
+
+`build_report.py` produces this; `build_pdf.py`/`build_longimage.py` inject overrides + a
+reveal-forcing script that depend on these hooks. The HTML **must** use them or the static
+PDF/PNG renders blank/animated-out:
 
 | Hook | Purpose |
 |---|---|
@@ -40,7 +70,8 @@ these hooks. The HTML **must** use them or the static PDF renders blank/animated
 | `.masthead` (legacy brand bar) | hidden in print; kept only for backward-compat (use `.topbar` instead) |
 | `section.ch` + `.ch-head` (number + `h2`) | section unit; header kept with its content, never orphaned |
 | `.cols` (**single-column stacked** grid: charts on top, note below) | forced to 1 column in print — **never left-right** |
-| `.stats` (stat strip), `.bignum`, `.note`, `.note p`, `.pq`, `.waffle`, `.legend`, `.act`, `.deck` | every text block kept intact across page breaks (no paragraph split mid-page) |
+| `.stats` (stat strip), `.note`, `.note p`, `.pq`, `.legend`, `.act`, `.deck`, `.note .fig` | every text block kept intact across page breaks (no paragraph split mid-page) |
+| ~~`.bignum`~~ / ~~`.waffle`~~ (DEPRECATED) | brand review 2026-06 retired both — use `.note .fig` inline figure instead of billboard `.bignum`; use `.bar-row` progress bars instead of `.waffle` grid. CSS kept for back-compat only; preflight WARNs if used |
 | `footer` (dark colophon block at the end) | kept intact; source/disclaimer at **10px** (small, muted — not body size) |
 
 ### Design rules (updated per brand review 2026-06)
@@ -129,5 +160,19 @@ Paths resolve relative to the config file's directory. Run:
 
 - Report file: `docs/ANALYSIS_YYYY-MM-DD_<topic>.md` with credibility disclaimer + `[已核实]`
   annotations; update the README report index.
-- Lark push: `--as bot` (dingning.ai) unless the user asks for personal identity. Sync to Feishu
-  Wiki with the feishu-wiki skill.
+- Lark push: `--as bot` (dingning.ai) unless the user asks for personal identity.
+
+### Feishu delivery (长图/长 PDF into a Wiki doc)
+
+- `feishu-wiki/push.py <md>` imports a Markdown report → a Wiki **docx**. **CAUTION: md import does
+  NOT carry local images/attachments** — a `![](local.png)` will not appear. The pushed doc is
+  text/tables only.
+- To put the 长图 cover + 长 PDF attachment INTO the Wiki doc, after pushing run:
+  ```bash
+  python3 ~/.claude/skills/feishu-wiki/push.py --embed <wiki_url> --image <cover-long.png> --file <report-long.pdf>
+  ```
+  It inserts a docx image block (top) + file block via the docx blocks API.
+- **Requires the app to have `docx:document` (user-identity) scope.** Without it `--embed` fails
+  gracefully with the fix steps (open scope → republish → `--login` re-auth). `push.py --status`
+  now预检 this scope and reports "图片嵌入能力 ✓/✗". If unavailable, fall back to dragging the
+  files into the doc by hand, or deliver the 长图/长 PDF via Lark IM (first-class file upload).

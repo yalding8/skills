@@ -19,26 +19,38 @@ Produces a uhomes-branded insight report across five stages. Stages 1–3 are me
 3. **输出报告 (Analyze & write)** — run real SQL / tally before stating any number; show raw data,
    then conclusions. Annotate every quantified claim `[已核实]`/`[AI 估算]`. Write findings as a
    tight narrative (chapters + exhibits), bilingual (CN + EN) when for external sharing.
-4. **产生 HTML (Design)** — build the report as a magazine-style HTML page that conforms to the
-   **render contract** (brand fonts; `.rv` reveal blocks; `.bar i[data-w]` bars; `section.ch` /
-   `.ch-head` / `.cols` / `.stats` / `.pq` structure). The PDF script depends on these hooks.
-   See REFERENCE.md §HTML render contract. Produce one HTML per language.
-5. **输出 (Export)** — two output modes from the SAME `report.config.json`:
+4. **产生 HTML (Design)** — DO NOT hand-write two ~430-line HTML files. The layout lives in ONE
+   shared template; content/data live in `content.<lang>.json`. Edit the JSON, then generate:
+   ```bash
+   python3 ~/.claude/skills/insight-report/scripts/build_report.py content.cn.json   # → CN html
+   python3 ~/.claude/skills/insight-report/scripts/build_report.py content.en.json   # → EN html
+   ```
+   `lang: "cn"|"en"` picks the whole typographic preset (CN=阿里普惠体, EN=Montserrat) — no CSS
+   edits needed. Change layout → edit `templates/report.template.html` (both languages benefit);
+   change copy/data → edit the JSON only. The output conforms to the **render contract** (`.rv`
+   reveal blocks; `.bar i[data-w]` bars; `section.ch`/`.ch-head`/`.cols`/`.stats`/`.pq`). See
+   REFERENCE.md §Templated authoring + §HTML render contract. (Bar widths come from the helper —
+   never hand-compute `data-w`; give raw values, see REFERENCE §Bar helper.)
+5. **自检 + 输出 (Preflight + Export)** — decide the output form FIRST (default 长版本 for
+   external sharing; A4 only for formal print), then build, then **gate on preflight**:
 
-   - **A4 PDF** (paginated, watermark + running header/footer) — for formal/print:
-     ```bash
-     python3 ~/.claude/skills/insight-report/scripts/build_pdf.py report.config.json
-     ```
-   - **长版本 / continuous** (one single tall page — NO A4 pagination, NO per-page
-     header/footer/whitespace) — for WeChat / Feishu / social / scroll reading:
+   - **长版本 / continuous** (DEFAULT — one tall page, NO A4 pagination/header/footer/whitespace):
      ```bash
      python3 ~/.claude/skills/insight-report/scripts/build_longimage.py report.config.json
      ```
-     Emits BOTH `<src>-long.png` (raster 长图) AND `<src>-long.pdf` (single-page vector PDF,
-     selectable text, small file) per report. Optional config keys: `width` (col px, default
-     1200), `scale` (PNG DPR, default 2), shares `watermark`. **When the user wants a "长版本" /
-     continuous report rather than A4 pages, use THIS — both the PNG and the long PDF are
-     continuous; `build_pdf.py` is only for formal A4-paginated output.**
+     Emits BOTH `<src>-long.png` (raster 长图) AND `<src>-long.pdf` (single-page vector PDF). Keys:
+     `width` (default 1200), `scale` (PNG DPR, default 2), shares `watermark`.
+   - **A4 PDF** (paginated, watermark + running header/footer) — formal/print only:
+     ```bash
+     python3 ~/.claude/skills/insight-report/scripts/build_pdf.py report.config.json
+     ```
+   - **Preflight gate (mandatory before shipping)** — static + raster lint; FAIL blocks output:
+     ```bash
+     python3 ~/.claude/skills/insight-report/scripts/preflight.py report.config.json
+     ```
+     **FAIL must be zero; re-review every ⚠️ WARN by eye.** See §Preflight gate below.
+   - Then **verify visually** — rasterize (`pdftoppm -png`) and eyeball; never declare done from
+     page count alone. To deliver into Feishu, see REFERENCE §Feishu delivery.
 
 ## Stage 5 quick start
 
@@ -61,9 +73,30 @@ Then run the script. Output: each PDF gets a tiled diagonal watermark, a running
 on **every** page. After building, **verify visually** — rasterize pages (`pdftoppm -png`) and
 eyeball the boundaries; do not declare done from the page count alone.
 
+## Preflight gate (出片前自检 — mandatory门禁)
+
+Before exporting/shipping, run preflight on the report config — this is a hard gate:
+
+```bash
+python3 ~/.claude/skills/insight-report/scripts/preflight.py report.config.json
+```
+
+- **FAIL must be zero** (`bar-overflow`: any `data-w > 100`). Non-zero exit = do not ship, fix first.
+- **Every ⚠️ WARN must be eyeballed** — WARN ≠ ignorable; it's "machine can't be sure, human must judge."
+  WARNs map to defects this skill historically shipped only because a human caught them:
+  `billboard-bignum` (big number → `.note .fig` inline) · `waffle` (→ `.bar-row`) · `footer-fontsize`
+  (~10px) · `cols-single-column` (must be stacked) · `topbar` (visible; legacy `.masthead`
+  display:none) · `title-orphan` (`<h1>` fragments ≤9 CJK chars) · `render-contract` (`.bar`>`<i data-w>`,
+  `.rv`, `:root` vars) · `a4-ragged-whitespace` (non-last page >35% empty bottom = content jumped).
+- Order: build PDF/long → run preflight (raster checks need the PDF present) → FAIL=0 + WARN reviewed
+  → only then push/archive. Report "preflight FAIL=0, N WARN reviewed" in the delivery summary.
+
 ## Conventions (always)
 
 - Brand fonts: 中文 阿里普惠体 (Alibaba PuHuiTi) / 英文 Montserrat.
+- **Templated authoring (not hand-written HTML).** One `templates/report.template.html` + per-language
+  `content.<lang>.json` → `build_report.py`. Edit layout once (template), copy/data in JSON. Never
+  maintain two parallel HTML files by hand. See REFERENCE.md §Templated authoring + §Bar helper.
 - **Layout (brand review 2026-06): stacked not boxed.** Single-column `.cols` (chart on top, note
   below — never left-right); no heavy boxed stat strip; footer source/disclaimer at ~10px; every
   text block atomic across pages. See REFERENCE.md §Design rules.
