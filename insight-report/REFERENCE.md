@@ -42,6 +42,16 @@ Change layout → edit `templates/report.template.html` or a preset once, both l
 Change copy/data → edit only the relevant `content.<lang>.json`. Output name = JSON `output` key (or `-o`).
 Starter: `templates/content.example.json` (delete its `__*` comment keys in a real file).
 
+### content JSON — head & footer extras
+
+- **`head.keywords`** (optional): comma-separated SEO/social tags → `<meta name="keywords">`. Omit
+  → empty meta (back-compatible; old reports build unchanged).
+- **`footer.brand` is injected as RAW HTML** (not escaped) — so brand segments can be clickable links:
+  `"<a href=\"https://www.uhomes.com\" target=\"_blank\" rel=\"noopener\">uhomes.com</a>　·　…"`.
+  Links inherit color + have no underline (`footer .f-brand a`), and survive as clickable `/URI`
+  annotations in the A4 PDF and long PDF (NOT in the long **PNG** — it's a flat raster). EN brand line
+  is `uhomes.com · UhomesPay · Uhomesjobs` → `www.uhomes.com` / `uhomespay.com` / `uhomesjobs.com`.
+
 ### Bar helper (never hand-compute `data-w`)
 
 Each chart carries `"bars": [...]`; each row `{label, value, ...}`. The helper computes bar widths:
@@ -89,6 +99,18 @@ PDF/PNG renders blank/animated-out:
    bar chart of the same data reads as abrupt and redundant. Integrate the figure as a moderate
    inline lead (`.note .fig`, ~26–38px coral) inside the note instead. Reserve big numbers for a
    page with no competing chart.
+6. **Stat-strip color is SEMANTIC by sign, not positional.** `build_report.py` colors each `.stats b`
+   by the sign of its `b` value: leading `+` → green `.pos` (rise), leading `−`/`-` → red `.neg`
+   (fall), **unsigned** numbers fall back to the positional palette (`nth-child` green/ink/coral/sand).
+   This is auto — do NOT re-introduce hard positional colors for signed deltas (the old bug: a `+8.0`
+   rise rendered coral/red, contradicting the chart legend "green up, red down"). Override a cell with
+   `"tone":"pos"|"neg"|"neutral"` in JSON. **Never mix a signed delta with a bare ratio in the same
+   strip** — rewrite `"7 / 8"` as a big count `"7"` with the denominator in the span
+   (`"of the top-8 …"`), else the fraction reads ambiguously next to `+9.3 / −5.6`.
+7. **Leading +/− is auto-wrapped in `<span class="sgn">`** and rendered as a small raised affix
+   (`.neg .sgn` shrinks harder). Montserrat draws U+2212 as a wide bar that visually outweighs the
+   compact `+`; the affix balances the pair. Automatic — keep using the real minus `−` (U+2212), not
+   a hyphen, in JSON.
 
 ### Logo strategy
 
@@ -109,6 +131,15 @@ for single-school / property reports the footer corner mark stays uhomes):
 `.topbar` stays visible in print (unlike `.masthead`). The CDP running header (thin text
 title/brand) still repeats on interior pages for continuity. Assets: `uhomes-logo-red.svg`
 (uhomes.com), `uhomes-cn-logo-red.svg` (异乡好居), + white variants for dark backgrounds.
+
+**Wordmark sizing (do not "fix" by inflating the box).** `uhomes-logo-red.svg` is **tight-cropped**
+(`viewBox="98 214 1404 172"`) — the original Adobe export had `viewBox="0 0 1600 600"` with ~74%
+vertical whitespace, so at `height:34px` the visible ink was only ~7px (smaller than the 11px issue
+text). The EN wordmark therefore renders with class `logo logo-uhomes` sized `height:18px`; generic
+`.logo` stays `34px` for square / custom single-image logos (`logo_src`). If a wordmark looks tiny,
+the fix is **crop the SVG viewBox to the ink bounds**, not bump the CSS height (which just adds dead
+space). ⚠️ The white variant `uhomes-logo-white.svg` still has the old padding — crop its viewBox the
+same way before using it as a topbar wordmark.
 
 Design system: brand fonts (阿里普惠体 / Montserrat via `@font-face` + Google Fonts `@import`);
 warm paper palette; numbered chapters; each exhibit has a title (`.ct`/`.cn2`) + source line.

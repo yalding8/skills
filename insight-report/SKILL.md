@@ -100,6 +100,14 @@ python3 ~/.claude/skills/insight-report/scripts/preflight.py report.config.json
 - **Layout (brand review 2026-06): stacked not boxed.** Single-column `.cols` (chart on top, note
   below — never left-right); no heavy boxed stat strip; footer source/disclaimer at ~10px; every
   text block atomic across pages. See REFERENCE.md §Design rules.
+- **Stat strip = semantic color by sign (auto).** `+`→green, `−`→red, unsigned→positional fallback;
+  override with `"tone"`. Don't mix a signed delta with a bare ratio (`"7 / 8"`) — rewrite as big
+  count `"7"` + denominator in the span. Leading +/− auto-balanced via `.sgn`. See REFERENCE §Design
+  rules 6–7.
+- **Logo wordmark is tight-cropped** (`logo-uhomes`, 18px); if a wordmark looks tiny, crop the SVG
+  viewBox, don't inflate CSS height. `head.keywords` → meta tags; `footer.brand` takes raw HTML so
+  brand names can be clickable links (live in HTML/PDF, not PNG). See REFERENCE §Logo strategy +
+  §content JSON extras.
 - **Logo by language (auto)**: EN report → **uhomes.com only** (`uhomes-logo-red.svg`); CN report →
   **3-brand combined logo 异乡好居 ｜ 异乡缴费 ｜ 异乡人才** (`uhomes-cn-combined-logo.svg`).
   `build_report.py` picks this from `lang` — leave `content.topbar` as just `issue`. Override per
