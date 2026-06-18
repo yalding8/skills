@@ -59,7 +59,7 @@ CONTENT JSON SHAPE  (see templates/content.example.json for an annotated copy)
   "lang": "cn" | "en",          # picks the built-in style preset
   "output": "report-cn.html",
   "style": { ... optional CSS overrides on top of the preset ... },
-  "head": { meta_description, og_title, og_description, page_title, lang_attr? },
+  "head": { meta_description, og_title, og_description, page_title, lang_attr?, keywords? },
   "topbar": { logo_src, logo_alt, issue (may contain <br>) },
   "hero": { kicker, h1 (may contain <br>/<span class=accent>), deck,
             meta: [ {b, span}, x4 ] },
@@ -466,6 +466,7 @@ def build(content, json_dir):
     mapping.update({
         "lang": head.get("lang_attr", "zh-CN" if lang == "cn" else "en"),
         "meta_description": head["meta_description"],
+        "keywords": head.get("keywords", ""),  # optional: comma-separated SEO/social tags
         "og_title": head["og_title"],
         "og_description": head["og_description"],
         "page_title": head["page_title"],

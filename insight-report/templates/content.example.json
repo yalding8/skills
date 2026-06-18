@@ -13,6 +13,7 @@
     "lang_attr": "zh-CN",
     "__lang_attr": "<html lang=...> value. Defaults zh-CN for cn / en for en.",
     "meta_description": "...SEO description...",
+    "keywords": "...OPTIONAL comma-separated SEO/social tags, e.g. 'QS 2027, World University Rankings, Study-Abroad'. Omit to leave the keywords meta empty...",
     "og_title": "...social share title...",
     "og_description": "...social share one-liner...",
     "page_title": "...browser tab title..."
