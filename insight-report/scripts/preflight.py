@@ -297,13 +297,18 @@ def check_render_contract(body, css, out):
     Missing -> WARN (PDF will render blank/animated-out)."""
     problems = []
 
-    # every <span class="bar ..."> ... </span> should contain an <i data-w=...>
-    bars = re.findall(r'<span[^>]*\bclass\s*=\s*["\'][^"\']*\bbar\b[^"\']*["\'][^>]*>(.*?)</span>',
+    # every bar-row containing a .bar should carry an <i data-w> (horizontal bars fill via the
+    # reveal script). Scan the whole bar-row, NOT just the first </span> after .bar — diverging
+    # bars nest <span class="track"> inside .bar, which mis-fired the old non-greedy capture.
+    # (Column charts use .col + <i data-h>, line/donut are SVG — none carry .bar, so none flagged.)
+    rows = re.findall(r'<div[^>]*\bclass\s*=\s*["\'][^"\']*\bbar-row\b[^"\']*["\'][^>]*>(.*?)</div>',
                       body, re.S | re.I)
-    bars_missing = sum(1 for inner in bars if not re.search(r"<i[^>]*\bdata-w\b", inner, re.I))
-    if bars and bars_missing:
-        problems.append("{}/{} 个 .bar 缺少内部 <i data-w=…>（打印时不会填充）"
-                        .format(bars_missing, len(bars)))
+    rows_missing = sum(1 for inner in rows
+                       if re.search(r'class\s*=\s*["\'][^"\']*\bbar\b', inner, re.I)
+                       and not re.search(r"<i[^>]*\bdata-w\b", inner, re.I))
+    if rows and rows_missing:
+        problems.append("{}/{} 个 bar-row 的 .bar 缺少 <i data-w=…>（打印时不会填充）"
+                        .format(rows_missing, len(rows)))
 
     # .rv must exist as an element class (the PDF script forces .rv.on visible)
     if not _has_element_class(body, "rv"):
