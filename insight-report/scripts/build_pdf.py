@@ -9,6 +9,7 @@ Config schema (paths are resolved relative to the config file's directory):
 
     {
       "watermark": "Pro.uhomes.com",          // optional; "" disables the watermark
+      "watermark_logo": "assets/...svg",       // optional; EN watermark logo (default uhomes.com)
       "logo": "assets/uhomes-logo-red.svg",    // optional; default = this skill's red wordmark
       "reports": [
         {
