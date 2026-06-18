@@ -88,8 +88,9 @@ python3 ~/.claude/skills/insight-report/scripts/preflight.py report.config.json
   WARNs map to defects this skill historically shipped only because a human caught them:
   `billboard-bignum` (big number → `.note .fig` inline) · `waffle` (→ `.bar-row`) · `footer-fontsize`
   (~10px) · `cols-single-column` (must be stacked) · `topbar` (visible; legacy `.masthead`
-  display:none) · `title-orphan` (`<h1>` fragments ≤9 CJK chars) · `render-contract` (`.bar`>`<i data-w>`,
-  `.rv`, `:root` vars) · `a4-ragged-whitespace` (non-last page >35% empty bottom = content jumped).
+  display:none) · `title-orphan` (`<h1>` fragments ≤9 CJK chars) · `bar-color-discipline` (no legacy
+  positional `coral/sand/ink` bar classes — use the 4-colour `hl/up/neg`) · `render-contract`
+  (`.bar`>`<i data-w>`, `.rv`, `:root` vars) · `a4-ragged-whitespace` (non-last page >35% empty bottom).
 - Order: build PDF/long → run preflight (raster checks need the PDF present) → FAIL=0 + WARN reviewed
   → only then push/archive. Report "preflight FAIL=0, N WARN reviewed" in the delivery summary.
 
@@ -99,15 +100,29 @@ python3 ~/.claude/skills/insight-report/scripts/preflight.py report.config.json
 - **Templated authoring (not hand-written HTML).** One `templates/report.template.html` + per-language
   `content.<lang>.json` → `build_report.py`. Edit layout once (template), copy/data in JSON. Never
   maintain two parallel HTML files by hand. See REFERENCE.md §Templated authoring + §Bar helper.
-- **Layout (brand review 2026-06): stacked not boxed.** Single-column `.cols` (chart on top, note
-  below — never left-right); no heavy boxed stat strip; footer source/disclaimer at ~10px; every
-  text block atomic across pages. See REFERENCE.md §Design rules.
-- **Stat strip = semantic color by sign (auto).** `+`→green, `−`→red, unsigned→positional fallback;
-  override with `"tone"`. Don't mix a signed delta with a bare ratio (`"7 / 8"`) — rewrite as big
-  count `"7"` + denominator in the span. Leading +/− auto-balanced via `.sgn`. See REFERENCE §Design
-  rules 6–7.
-- **Logo wordmark is tight-cropped** (`logo-uhomes`, 18px); if a wordmark looks tiny, crop the SVG
-  viewBox, don't inflate CSS height. `head.keywords` → meta tags; `footer.brand` takes raw HTML so
+- **4-COLOUR SEMANTIC SYSTEM (brand review 2026-06-18) — the hard rule.** Colour MUST encode data,
+  never decorate. Only four roles exist: **品牌色 `--brand` #FF5A5F** (logo accents, chapter numbers,
+  h1 accent, the ONE highlighted/subject bar) · **增长绿 `--up`** (positive/rising) · **下降红
+  `--down` #c8102e** (negative/falling — deeper than brand) · **普通数据灰 `--data`** (everything else).
+  Charts default to neutral grey; you opt INTO colour with `hl`/`up`/`neg`. Do NOT use the legacy
+  positional `style:"coral"/"sand"/"ink"` classes (preflight `bar-color-discipline` WARNs). Comparison
+  charts = all grey + ONE highlight (the subject). See REFERENCE.md §Design rules + §Chart variants.
+- **Layout (brand review 2026-06-18): stacked; light cards OK, no heavy box.** Single-column `.cols`
+  (chart on top, note below — never left-right); footer source/disclaimer at ~10px; every text block
+  atomic across pages. The stat strip is now **light cards** (soft white fill, rounded, hairline
+  border) — this replaced the earlier "no boxes" rule; the *heavy 2px segmented* box is still banned
+  (it broke across pages), the light card is approved. See REFERENCE.md §Design rules.
+- **Stat cards = semantic colour by sign (auto).** `+`→`--up` green, `−`→`--down` red, unsigned→
+  neutral ink (NO positional rainbow). Override with `"tone"`. Don't mix a signed delta with a bare
+  ratio (`"7 / 8"`) — rewrite as big count `"7"` + denominator in the span. Leading +/− auto-balanced
+  via `.sgn`. See REFERENCE §Design rules 6–7.
+- **Chart variants (pick the form that fits the question).** `variant`: `"line"` (trend over time),
+  `"donut"` (share/proportion, highlight one slice), `"column"` (vertical bars, time comparison,
+  grey + 1 highlight), default `"bar"` (horizontal); add `"diverging":true` to a bar chart so
+  **negative values SHOW** (extend left in `--down` red around a centre axis). See REFERENCE §Chart variants.
+- **Logo wordmark is tight-cropped** (`logo-uhomes`, 24px after the 2026-06-18 brand enlargement; CN
+  combined logo 34px); if a wordmark looks tiny, crop the SVG viewBox, don't inflate CSS height beyond
+  the cropped ink. `head.keywords` → meta tags; `footer.brand` takes raw HTML so
   brand names can be clickable links (live in HTML/PDF, not PNG). See REFERENCE §Logo strategy +
   §content JSON extras.
 - **Generated HTML is self-contained** — the logo is embedded as a `data:` URI, so handoff = ship the

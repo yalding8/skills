@@ -36,7 +36,7 @@
       { "b": "2016–26", "span": "..." },
       { "b": "06-17", "span": "..." }
     ],
-    "__meta": "exactly 4 hero stat cells: b = big green number, span = small caption."
+    "__meta": "exactly 4 hero meta cells: b = big neutral-ink number, span = small caption (these are plain facts, not up/down deltas — kept neutral)."
   },
 
   "stats": [
@@ -45,7 +45,7 @@
     { "b": "−2.5%", "span": "..." },
     { "b": "#17 · 8.7%", "span": "..." }
   ],
-  "__stats": "the headline stat strip (inv 2: hairline top/bottom rules, thin dividers, NO box). Exactly 4 cells. Color is SEMANTIC by sign: a leading + → green(rise), a leading − → red(fall); UNSIGNED numbers fall back to the positional palette (green / ink / coral / sand by position). Add \"tone\":\"pos\"|\"neg\"|\"neutral\" to a cell to override. Don't put a signed delta in the same strip as a bare ratio like \"7 / 8\" — rewrite the ratio as a big count (\"7\") with the denominator in the span (\"of the top-8 …\") to avoid fraction ambiguity.",
+  "__stats": "the headline stat cards (brand review 2026-06-18: light cards — soft fill, rounded, hairline border; NOT a heavy segmented box). Exactly 4 cells. Colour is SEMANTIC by sign: a leading + → growth green, a leading − → decline red, UNSIGNED → neutral ink (the old positional rainbow was removed). Add \"tone\":\"pos\"|\"neg\"|\"neutral\" to override. Don't put a signed delta in the same strip as a bare ratio like \"7 / 8\" — rewrite the ratio as a big count (\"7\") with the denominator in the span (\"of the top-8 …\").",
 
   "chapters": [
     {
@@ -55,18 +55,20 @@
       "blocks": [
         {
           "type": "chart",
-          "ct": "图表标题（绿色小字）",
+          "ct": "图表标题（中性小字）",
           "cn2": "图表副说明（灰色小字）",
+          "__variant": "CHART TYPE (default 'bar'). Match the form to the question: 'line'=trend over time; 'donut'=share/proportion; 'column'=vertical bars for a time comparison; 'bar'=ranking (horizontal). Add \"diverging\":true to a bar chart so NEGATIVE values show (extend left in decline-red). See REFERENCE §Chart variants.",
+          "variant": "column",
           "mode": "scale",
-          "__mode": "BAR HELPER MODE. 'scale' (default): data-w = value/max*scale, for raw magnitudes. 'percent': data-w = value, printed as N%, for shares summing to 100 (inv 6 progress bars). 'raw_w': you give w + value_text, no math, for YoY-% charts where bar length is a manual visual encoding.",
+          "__mode": "BAR HELPER MODE (variant 'bar'/'column' only). 'scale' (default): data-w=value/max*scale. 'percent': data-w=value, printed N%. 'raw_w': you give w+value_text, no math, for hand-tuned YoY-% bars.",
           "scale": 95,
           "__scale": "only used by mode 'scale'; biggest bar maps to this width (~95). Default 95.",
           "bars": [
-            { "label": "2021 峰", "value": 746, "style": "coral", "hl": true },
+            { "label": "2021 峰", "value": 746, "hl": true },
             { "label": "2022", "value": 655 },
-            { "label": "2025", "value": 314, "style": "sand" }
+            { "label": "2025", "value": 314 }
           ],
-          "__bars": "Each row: label (str, right of bar) + value (number). style: ''|'coral'|'sand'|'ink' bar color. hl: highlight (bold label, coral val). value_text: override printed cell (e.g. '+22%','2.0万'). w: explicit data-w (REQUIRED for raw_w; in scale mode use it to reproduce hand-tuned widths 1:1). neg:true OR value<0 -> width 0, coral val, minus sign kept (inv: ch05 negatives)."
+          "__bars": "Each row: label + value. COLOUR IS SEMANTIC (4-colour system, brand review 2026-06-18): default = neutral grey; hl:true → THE highlighted/subject bar (brand #FF5A5F, bold label); up:true → growth green; neg:true OR value<0 → decline red (in a normal bar the width zeroes; in a 'diverging' bar it extends LEFT). value_text overrides the printed cell ('+22%','2.0万'). w = explicit data-w (REQUIRED for raw_w). DO NOT use the legacy style:'coral'/'sand'/'ink' classes — preflight WARNs. For 'line': rows are ordered points (hl/down mark a dot). For 'donut': rows are slices (hl = brand slice); add \"center\":{\"value\":\"47%\",\"label\":\"…\"}."
         },
         {
           "type": "note",

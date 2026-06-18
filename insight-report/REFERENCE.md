@@ -93,15 +93,31 @@ PDF/PNG renders blank/animated-out:
 | `.masthead` (legacy brand bar) | hidden in print; kept only for backward-compat (use `.topbar` instead) |
 | `section.ch` + `.ch-head` (number + `h2`) | section unit; header kept with its content, never orphaned |
 | `.cols` (**single-column stacked** grid: charts on top, note below) | forced to 1 column in print — **never left-right** |
-| `.stats` (stat strip), `.note`, `.note p`, `.pq`, `.legend`, `.act`, `.deck`, `.note .fig` | every text block kept intact across page breaks (no paragraph split mid-page) |
+| `<div class="col-chart">` + `.col` w/ `<i data-h="N">` | vertical-column chart; reveal script sets `i.style.height` from `data-h` (mirrors `.bar i[data-w]`) — must be present or columns render flat in print |
+| `.linechart svg` / `.donut-chart svg` | line & donut charts are **static SVG** (final values baked in); they need no data attr, only the `.rv` wrapper to fade in — they render 1:1 in print |
+| `.bar.div` (diverging) holds `.track` spans + `<i data-w>` (and `<i class="neg" data-w>` for left) | signed bars around a centre axis; the `<i data-w>` still drives fill width |
+| `.stats .cell` (now a **light card**), `.note`, `.note p`, `.pq`, `.legend`, `.donut-legend`, `.col-chart`, `.linechart`, `.donut-chart`, `.act`, `.deck`, `.note .fig` | every text block / chart kept intact across page breaks (no split mid-page) |
 | ~~`.bignum`~~ / ~~`.waffle`~~ (DEPRECATED) | brand review 2026-06 retired both — use `.note .fig` inline figure instead of billboard `.bignum`; use `.bar-row` progress bars instead of `.waffle` grid. CSS kept for back-compat only; preflight WARNs if used |
 | `footer` (dark colophon block at the end) | kept intact; source/disclaimer at **10px** (small, muted — not body size) |
 
-### Design rules (updated per brand review 2026-06)
+### Design rules (updated per brand review 2026-06-18)
 
-1. **No "boxed/segmented" look.** Do NOT wrap the stat strip in a heavy 2px box with 2px internal
-   dividers — it reads as segmented and breaks badly across pages. Use a light strip: hairline
-   top/bottom rules + thin `var(--line)` dividers, no outer box.
+0. **4-COLOUR SEMANTIC SYSTEM (the governing rule).** Colour encodes data; it never decorates. There
+   are exactly four data roles, defined as `:root` vars:
+   - `--brand` **#FF5A5F** (uhomes 品牌色) — structural accents: logo, chapter numbers, h1 accent,
+     note border, AND **the one highlighted/subject bar** in any comparison chart.
+   - `--up` (增长绿) — positive / rising values only.
+   - `--down` **#c8102e** (下降红, deeper than brand) — negative / falling values only.
+   - `--data` (普通数据灰) — the DEFAULT fill for every non-highlighted bar/column/slice.
+   Charts default to `--data`; you opt into meaning with row keys `hl` (→brand), `up` (→green),
+   `neg` (→red, auto when value<0). The legacy positional classes `style:"coral"/"sand"/"ink"` are
+   DEPRECATED — preflight `bar-color-discipline` WARNs on them. The whole point: a reader must be able
+   to tell what a colour MEANS. (Origin: the positional green/amber/red/ink rainbow carried no meaning
+   and brand flagged it as "colours are confusing, nobody knows what they represent.")
+1. **Light cards, not a heavy box.** The stat strip is now light cards (soft white fill, `border-radius`,
+   hairline `var(--line)` border, `gap`) — approved 2026-06-18. The earlier "no boxes at all" rule was
+   about the *heavy 2px segmented* strip that read as chopped-up and broke across pages; that is still
+   banned. A clean light card with `break-inside:avoid` is fine and is what brand asked for.
 2. **Stacked, not side-by-side.** `.cols` is a single column: each exhibit is a full-width chart
    followed by its note **below** it. No left-chart / right-note two-column layout.
 3. **Footer fine print is small.** Source + disclaimer in `footer p` at ~10px, muted color —
@@ -112,18 +128,36 @@ PDF/PNG renders blank/animated-out:
    bar chart of the same data reads as abrupt and redundant. Integrate the figure as a moderate
    inline lead (`.note .fig`, ~26–38px coral) inside the note instead. Reserve big numbers for a
    page with no competing chart.
-6. **Stat-strip color is SEMANTIC by sign, not positional.** `build_report.py` colors each `.stats b`
-   by the sign of its `b` value: leading `+` → green `.pos` (rise), leading `−`/`-` → red `.neg`
-   (fall), **unsigned** numbers fall back to the positional palette (`nth-child` green/ink/coral/sand).
-   This is auto — do NOT re-introduce hard positional colors for signed deltas (the old bug: a `+8.0`
-   rise rendered coral/red, contradicting the chart legend "green up, red down"). Override a cell with
-   `"tone":"pos"|"neg"|"neutral"` in JSON. **Never mix a signed delta with a bare ratio in the same
-   strip** — rewrite `"7 / 8"` as a big count `"7"` with the denominator in the span
+6. **Stat-card color is SEMANTIC by sign (no positional rainbow).** `build_report.py` colors each
+   `.stats b` by the sign of its `b` value: leading `+` → `--up` green `.pos` (rise), leading `−`/`-` →
+   `--down` red `.neg` (fall), **unsigned** numbers → neutral ink (the old `nth-child` positional
+   palette was REMOVED 2026-06-18 — it was exactly the meaningless-colour problem). This is auto —
+   override a cell with `"tone":"pos"|"neg"|"neutral"` in JSON. **Never mix a signed delta with a bare
+   ratio in the same strip** — rewrite `"7 / 8"` as a big count `"7"` with the denominator in the span
    (`"of the top-8 …"`), else the fraction reads ambiguously next to `+9.3 / −5.6`.
 7. **Leading +/− is auto-wrapped in `<span class="sgn">`** and rendered as a small raised affix
    (`.neg .sgn` shrinks harder). Montserrat draws U+2212 as a wide bar that visually outweighs the
    compact `+`; the affix balances the pair. Automatic — keep using the real minus `−` (U+2212), not
    a hyphen, in JSON.
+
+### Chart variants (added 2026-06-18 — pick the form that fits the question)
+
+A `chart` block takes an optional `"variant"` (default `"bar"`). Match the chart type to what the
+exhibit is arguing — brand review called out using horizontal bars for everything:
+
+| variant | use for | data shape | colour |
+|---|---|---|---|
+| `"line"` | a **trend** over time | `bars:[{label,value,hl?,down?,up?}]` (ordered points) | ink line + faint brand area; per-point dot — `hl`=brand, `down`=red, else neutral |
+| `"donut"` | a **share / proportion** | `bars:[{label,value,hl?}]`; optional `center:{value,label}` | highlighted slice=brand, rest=neutral greys |
+| `"column"` | a **time comparison** (few periods) | `bars:[{label,value,hl?/up?/down?}]` | default grey + ONE `hl` (subject) — "全灰，只突出一条红色" |
+| `"bar"` (default) | a **ranking** | `bars:[…]` with `mode` scale/percent/raw_w | default grey + ONE `hl`; legacy `style` deprecated |
+| `"bar"` + `"diverging":true` | a ranking **with negatives** | `bars:[{label,value (signed numeric),value_text}]` | + right (grey/`hl`), − **left in `--down` red** around a centre axis |
+
+Diverging requires real numeric `value` (it computes left/right from `max(|value|)`); use `value_text`
+for the printed label (`"+101%"`, `"−16%"`). The earlier behaviour (zeroing a negative bar to width 0)
+HID the decline — diverging is the fix for "negatives must show". Column charts reveal via `<i data-h>`
+(the build scripts force height the same way they force `.bar i[data-w]` width); line/donut are static
+SVG. Worked examples: the Cardiff report — 01 line, 02 donut, 03 column, 04 bar, 05 diverging.
 
 ### Logo strategy
 
