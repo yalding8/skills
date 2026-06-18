@@ -19,9 +19,7 @@
   },
 
   "topbar": {
-    "logo_src": "uhomes-logo-red.svg",
-    "__logo_src": "path to logo, relative to the HTML. Keep uhomes-logo-red.svg alongside the output (inv 1: logo stays visible in print).",
-    "logo_alt": "uhomes.com",
+    "__logo": "Logo is AUTO by lang — leave it out. EN→uhomes.com only; CN→combined 异乡好居｜uhomes.com. Keep uhomes-logo-red.svg (and uhomes-cn-logo-red.svg for CN) alongside the output so it shows in print. Override only for university/apartment reports via logo_src (single img) or logo_html (full custom).",
     "issue": "卡迪夫市场观察<br>2026 年 6 月",
     "__issue": "right-aligned issue line; <br> allowed."
   },

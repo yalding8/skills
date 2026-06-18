@@ -37,6 +37,11 @@ body{font-family:var(--cn);background:var(--paper);color:var(--ink);line-height:
 /* top logo lockup — city report uses uhomes own logo, stays visible in print */
 .topbar{display:flex;justify-content:space-between;align-items:center;padding:22px 0 16px;border-bottom:1.5px solid var(--ink)}
 .topbar .logo{height:34px;width:auto;display:block}
+/* CN combined lockup: 异乡好居 + uhomes.com; EN: uhomes.com only */
+.topbar .logolock{display:flex;align-items:center;gap:14px}
+.topbar .logolock .logo-cn{height:30px;width:auto;display:block}
+.topbar .logolock .logo-en{height:17px;width:auto;display:block}
+.topbar .logolock .logo-div{width:1px;height:24px;background:var(--line);display:block}
 .topbar .issue{font-family:var(--serif-num);font-size:11px;letter-spacing:${topbar_issue_ls};text-transform:uppercase;color:var(--ink-soft);text-align:right}
 .masthead{display:none}
 
@@ -145,7 +150,7 @@ footer .f-tag{font-family:var(--serif-num);font-size:11px;letter-spacing:${foote
 
 <div class="wrap">
   <div class="topbar">
-    <img class="logo" src="$logo_src" alt="$logo_alt">
+    $logo_html
     <div class="issue">$issue</div>
   </div>
 

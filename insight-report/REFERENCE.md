@@ -90,20 +90,25 @@ PDF/PNG renders blank/animated-out:
    inline lead (`.note .fig`, ~26–38px coral) inside the note instead. Reserve big numbers for a
    page with no competing chart.
 
-### Logo strategy (by report type)
+### Logo strategy
 
-Reports come in three types; the **top logo (`.topbar`) differs by type**, the footer corner
-mark is always the uhomes wordmark:
+**Primary rule — by language** (handled automatically by `build_report.py`, no config needed):
 
-| Report type | `.topbar` logo | Footer mark |
-|---|---|---|
-| **City** (e.g. Cardiff market) | uhomes own logo (`assets/uhomes-logo-red.svg`), placed top-left | uhomes |
-| **University** (single-school deep dive) | that university's logo top-left + small "× uhomes" lockup | uhomes |
-| **Apartment / property** | that apartment brand's logo top-left + "× uhomes" | uhomes |
+| Version | `.topbar` logo |
+|---|---|
+| **EN** report (`lang: "en"`) | **uhomes.com wordmark ONLY** (`assets/uhomes-logo-red.svg`) |
+| **CN** report (`lang: "cn"`) | **combined lockup**: 异乡好居 (`assets/uhomes-cn-logo-red.svg`) ｜ uhomes.com — rendered as `.logolock` (中文主标 height 30px + thin divider + uhomes.com 17px) |
 
-Put the logo as an `<img>` in `.topbar` at the top of `.wrap` (height ~30px), with the issue/date
-on the right. `.topbar` stays visible in print (unlike `.masthead`). The CDP running header (thin
-text title/brand) still repeats on interior pages for continuity.
+The generator picks this from `lang`; leave `content.topbar` with just `issue` (no `logo_src`).
+
+**Override — by report type** (set `content.topbar.logo_src` or `logo_html` to override the rule;
+for single-school / property reports the footer corner mark stays uhomes):
+- **University** deep-dive → that university's logo (`logo_src`) + "× uhomes".
+- **Apartment / property** → that apartment brand's logo + "× uhomes".
+
+`.topbar` stays visible in print (unlike `.masthead`). The CDP running header (thin text
+title/brand) still repeats on interior pages for continuity. Assets: `uhomes-logo-red.svg`
+(uhomes.com), `uhomes-cn-logo-red.svg` (异乡好居), + white variants for dark backgrounds.
 
 Design system: brand fonts (阿里普惠体 / Montserrat via `@font-face` + Google Fonts `@import`);
 warm paper palette; numbered chapters; each exhibit has a title (`.ct`/`.cn2`) + source line.

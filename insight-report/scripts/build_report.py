@@ -433,6 +433,26 @@ def render_stat_cells(stats):
     return "\n".join(out)
 
 
+def build_logo_html(lang, topbar):
+    """Topbar logo by rule:
+    - EN report  → uhomes.com wordmark only (uhomes-logo-red.svg)
+    - CN report  → combined lockup 异乡好居 + uhomes.com
+    Content can override: topbar.logo_html (full custom) or topbar.logo_src
+    (single img, for university/apartment report-type logos)."""
+    if topbar.get("logo_html"):
+        return topbar["logo_html"]
+    if topbar.get("logo_src"):
+        alt = topbar.get("logo_alt", "uhomes.com")
+        return '<img class="logo" src="%s" alt="%s">' % (topbar["logo_src"], alt)
+    if lang == "cn":
+        return ('<span class="logolock">'
+                '<img class="logo logo-cn" src="uhomes-cn-logo-red.svg" alt="异乡好居">'
+                '<span class="logo-div"></span>'
+                '<img class="logo logo-en" src="uhomes-logo-red.svg" alt="uhomes.com">'
+                '</span>')
+    return '<img class="logo" src="uhomes-logo-red.svg" alt="uhomes.com">'
+
+
 def build(content, json_dir):
     lang = content.get("lang", "cn")
     if lang not in PRESETS:
@@ -452,8 +472,7 @@ def build(content, json_dir):
         "og_title": head["og_title"],
         "og_description": head["og_description"],
         "page_title": head["page_title"],
-        "logo_src": topbar.get("logo_src", "uhomes-logo-red.svg"),
-        "logo_alt": topbar.get("logo_alt", "uhomes.com"),
+        "logo_html": build_logo_html(lang, topbar),
         "issue": topbar["issue"],
         "kicker": hero["kicker"],
         "h1": hero["h1"],

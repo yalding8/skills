@@ -100,9 +100,10 @@ python3 ~/.claude/skills/insight-report/scripts/preflight.py report.config.json
 - **Layout (brand review 2026-06): stacked not boxed.** Single-column `.cols` (chart on top, note
   below — never left-right); no heavy boxed stat strip; footer source/disclaimer at ~10px; every
   text block atomic across pages. See REFERENCE.md §Design rules.
-- **Logo by report type**: top `.topbar` logo = uhomes own (city report) / the university's logo
-  (university report) / the apartment brand's logo (apartment report); footer corner mark always
-  uhomes. See REFERENCE.md §Logo strategy. Bundled: `assets/uhomes-logo-red.svg` (+ white variant).
+- **Logo by language (auto)**: EN report → **uhomes.com only** (`uhomes-logo-red.svg`); CN report →
+  **combined lockup 异乡好居 ｜ uhomes.com** (`uhomes-cn-logo-red.svg` + uhomes.com). `build_report.py`
+  picks this from `lang` — leave `content.topbar` as just `issue`. Override per report-type
+  (university/apartment) via `content.topbar.logo_src`. See REFERENCE.md §Logo strategy.
 - Pre-register before results; show raw data before conclusions; annotate AI-estimated numbers.
 - Archive the report as `docs/ANALYSIS_YYYY-MM-DD_<topic>.md` and update the README index.
 
