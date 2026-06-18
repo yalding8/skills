@@ -148,6 +148,8 @@ footer .f-grid{display:grid;grid-template-columns:1fr auto;gap:32px;align-items:
 @media(max-width:700px){footer .f-grid{grid-template-columns:1fr}}
 footer .f-brand{font-weight:${footer_brand_weight};font-size:20px}
 footer .f-brand em{font-style:normal;color:var(--coral)}
+footer .f-brand a{color:inherit;text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s}
+footer .f-brand a:hover{border-bottom-color:currentColor}
 footer p{font-size:10px;color:#94a0a6;max-width:${footer_p_maxw};margin-top:12px;line-height:1.7}
 footer .f-tag{font-family:var(--serif-num);font-size:11px;letter-spacing:${footer_tag_ls};text-transform:uppercase;color:var(--sand)}
 </style>
