@@ -470,7 +470,7 @@ def build_logo_html(lang, topbar):
     if lang == "cn":
         return ('<img class="logo logo-combined" src="uhomes-cn-combined-logo.svg" '
                 'alt="异乡好居 异乡缴费 异乡人才">')
-    return '<img class="logo" src="uhomes-logo-red.svg" alt="uhomes.com">'
+    return '<img class="logo logo-uhomes" src="uhomes-logo-red.svg" alt="uhomes.com">'
 
 
 def build(content, json_dir):
