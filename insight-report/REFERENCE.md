@@ -128,13 +128,16 @@ PDF/PNG renders blank/animated-out:
    bar chart of the same data reads as abrupt and redundant. Integrate the figure as a moderate
    inline lead (`.note .fig`, ~26–38px coral) inside the note instead. Reserve big numbers for a
    page with no competing chart.
-6. **Stat-card color is SEMANTIC by sign (no positional rainbow).** `build_report.py` colors each
-   `.stats b` by the sign of its `b` value: leading `+` → `--up` green `.pos` (rise), leading `−`/`-` →
-   `--down` red `.neg` (fall), **unsigned** numbers → neutral ink (the old `nth-child` positional
-   palette was REMOVED 2026-06-18 — it was exactly the meaningless-colour problem). This is auto —
-   override a cell with `"tone":"pos"|"neg"|"neutral"` in JSON. **Never mix a signed delta with a bare
-   ratio in the same strip** — rewrite `"7 / 8"` as a big count `"7"` with the denominator in the span
-   (`"of the top-8 …"`), else the fraction reads ambiguously next to `+9.3 / −5.6`.
+6. **Stat cards = icon badge + semantic colour (designer mockup, 2026-06-18).** Each `.stats .cell`
+   renders: a coloured **circular icon badge** (`.ic`), the big number, a bold title (`.cap` ← `span`),
+   and a muted subtitle (`.sub` ← `sub`). Colour is SEMANTIC by sign: leading `+` → `--up` green
+   `.pos`, leading `−`/`-` → `--down` red `.neg`, **unsigned** → neutral ink (the old `nth-child`
+   positional rainbow was REMOVED — it was the meaningless-colour problem). The badge glyph auto-picks
+   `up`/`down`/`bars` by tone; override with `"icon":"up|down|bars|globe|flat"`. Override colour with
+   `"tone":"pos"|"neg"|"neutral"` — e.g. a *bad absolute* stat like a rank `#17` (no sign) → `"neg"`
+   to render it red, matching the mockup. A trailing `%` is auto-wrapped in `.u` (shrunk unit).
+   **Never mix a signed delta with a bare ratio in the same strip** — rewrite `"7 / 8"` as a big count
+   `"7"` with the denominator in the subtitle, else the fraction reads ambiguously next to `+9.3 / −5.6`.
 7. **Leading +/− is auto-wrapped in `<span class="sgn">`** and rendered as a small raised affix
    (`.neg .sgn` shrinks harder). Montserrat draws U+2212 as a wide bar that visually outweighs the
    compact `+`; the affix balances the pair. Automatic — keep using the real minus `−` (U+2212), not
