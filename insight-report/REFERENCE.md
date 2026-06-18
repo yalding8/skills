@@ -42,6 +42,19 @@ Change layout → edit `templates/report.template.html` or a preset once, both l
 Change copy/data → edit only the relevant `content.<lang>.json`. Output name = JSON `output` key (or `-o`).
 Starter: `templates/content.example.json` (delete its `__*` comment keys in a real file).
 
+### Self-contained HTML (handoff to ops)
+
+`build_report.py` **embeds the topbar logo as a base64 `data:` URI**, so the generated HTML has NO
+local asset dependency — ship the single `.html` and the logo renders anywhere (verified by rendering
+in an empty dir). Custom `topbar.logo_src` is embedded too (read relative to the content JSON); a
+missing file degrades to a plain relative `src` (then it MUST be shipped alongside). **History:**
+before this, the HTML referenced `uhomes-logo-red.svg` by relative path → "sent only the HTML, logo
+disappeared" on every handoff. Fixed by mechanism, not by "remember to attach the file."
+
+⚠️ **Fonts are still CDN-loaded** (Montserrat via Google Fonts, 阿里普惠体 via Aliyun OSS). The page
+needs internet for brand fonts; offline/air-gapped servers fall back to system fonts (layout intact,
+typeface differs). If a deploy target is intranet-only, embed the woff2 as `@font-face` data URIs too.
+
 ### content JSON — head & footer extras
 
 - **`head.keywords`** (optional): comma-separated SEO/social tags → `<meta name="keywords">`. Omit

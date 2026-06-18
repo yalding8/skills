@@ -456,21 +456,49 @@ def render_stat_cells(stats):
     return "\n".join(out)
 
 
-def build_logo_html(lang, topbar):
-    """Topbar logo by rule:
+ASSETS_DIR = os.path.join(HERE, "..", "assets")
+
+
+def _img_data_uri(path):
+    """Read an image file → a base64 data: URI so the HTML is self-contained (no sibling
+    asset to ship). Returns None if the file is missing (caller falls back to a plain src)."""
+    import base64
+    if not path or not os.path.isfile(path):
+        return None
+    ext = os.path.splitext(path)[1].lower()
+    mime = {".svg": "image/svg+xml", ".png": "image/png",
+            ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp"}.get(ext, "image/svg+xml")
+    with open(path, "rb") as f:
+        b64 = base64.b64encode(f.read()).decode("ascii")
+    return "data:%s;base64,%s" % (mime, b64)
+
+
+def _logo_img(cls, asset_path, alt, fallback_src):
+    """Emit an <img>; embed the asset as a data URI when present (self-contained HTML),
+    else fall back to a relative src (which then MUST be shipped alongside the HTML)."""
+    uri = _img_data_uri(asset_path)
+    return '<img class="%s" src="%s" alt="%s">' % (cls, uri or fallback_src, alt)
+
+
+def build_logo_html(lang, topbar, json_dir):
+    """Topbar logo by rule (assets embedded as data URIs → HTML is self-contained):
     - EN report → uhomes.com wordmark only (uhomes-logo-red.svg)
     - CN report → 3-brand combined logo 异乡好居+异乡缴费+异乡人才 (uhomes-cn-combined-logo.svg)
-    Content can override: topbar.logo_html (full custom) or topbar.logo_src
-    (single img, for university/apartment report-type logos)."""
+    Content can override: topbar.logo_html (full custom HTML, used verbatim) or topbar.logo_src
+    (single img relative to the content JSON, for university/apartment report-type logos)."""
     if topbar.get("logo_html"):
         return topbar["logo_html"]
     if topbar.get("logo_src"):
+        src = topbar["logo_src"]
         alt = topbar.get("logo_alt", "uhomes.com")
-        return '<img class="logo" src="%s" alt="%s">' % (topbar["logo_src"], alt)
+        return _logo_img("logo", os.path.join(json_dir, src), alt, src)
     if lang == "cn":
-        return ('<img class="logo logo-combined" src="uhomes-cn-combined-logo.svg" '
-                'alt="异乡好居 异乡缴费 异乡人才">')
-    return '<img class="logo logo-uhomes" src="uhomes-logo-red.svg" alt="uhomes.com">'
+        return _logo_img("logo logo-combined",
+                         os.path.join(ASSETS_DIR, "uhomes-cn-combined-logo.svg"),
+                         "异乡好居 异乡缴费 异乡人才", "uhomes-cn-combined-logo.svg")
+    return _logo_img("logo logo-uhomes",
+                     os.path.join(ASSETS_DIR, "uhomes-logo-red.svg"),
+                     "uhomes.com", "uhomes-logo-red.svg")
 
 
 def build(content, json_dir):
@@ -493,7 +521,7 @@ def build(content, json_dir):
         "og_title": head["og_title"],
         "og_description": head["og_description"],
         "page_title": head["page_title"],
-        "logo_html": build_logo_html(lang, topbar),
+        "logo_html": build_logo_html(lang, topbar, json_dir),
         "issue": topbar["issue"],
         "kicker": hero["kicker"],
         "h1": hero["h1"],

@@ -108,6 +108,9 @@ python3 ~/.claude/skills/insight-report/scripts/preflight.py report.config.json
   viewBox, don't inflate CSS height. `head.keywords` → meta tags; `footer.brand` takes raw HTML so
   brand names can be clickable links (live in HTML/PDF, not PNG). See REFERENCE §Logo strategy +
   §content JSON extras.
+- **Generated HTML is self-contained** — the logo is embedded as a `data:` URI, so handoff = ship the
+  single `.html` (no separate logo file). Fonts still load from CDN (online needed). See REFERENCE
+  §Self-contained HTML.
 - **Logo by language (auto)**: EN report → **uhomes.com only** (`uhomes-logo-red.svg`); CN report →
   **3-brand combined logo 异乡好居 ｜ 异乡缴费 ｜ 异乡人才** (`uhomes-cn-combined-logo.svg`).
   `build_report.py` picks this from `lang` — leave `content.topbar` as just `issue`. Override per
