@@ -33,24 +33,52 @@ CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 PORT = 9334  # distinct from build_pdf's 9333 so both can run
 
 
-def watermark_uri(text):
+def data_uri_svg(path):
+    with open(path, "rb") as f:
+        return "data:image/svg+xml;base64," + base64.b64encode(f.read()).decode("ascii")
+
+
+def _is_en(html):
+    import re
+    m = re.search(r'<html[^>]*\blang="([^"]+)"', html[:1000], re.I)
+    return bool(m) and m.group(1).lower().startswith("en")
+
+
+def watermark_uri(text, logo_uri=None):
+    """Tiled diagonal watermark. Returns (data_uri, tile_w, tile_h).
+
+    EN variant (logo_uri given) = the uhomes.com wordmark above the url text
+    (brand request 2026-06). Default = text-only tile (CN)."""
+    if logo_uri:
+        svg = (
+            "<svg xmlns='http://www.w3.org/2000/svg' "
+            "xmlns:xlink='http://www.w3.org/1999/xlink' width='360' height='230'>"
+            "<g transform='rotate(-28 180 115)' opacity='0.085'>"
+            f"<image xlink:href='{logo_uri}' x='66' y='62' width='168' height='63'/>"
+            f"<text x='86' y='150' font-family='Montserrat, Helvetica, Arial, sans-serif' "
+            f"font-size='16' font-weight='600' fill='#1f5d7a' letter-spacing='1'>{text}</text>"
+            "</g></svg>"
+        )
+        return "data:image/svg+xml," + urllib.parse.quote(svg), 360, 230
     svg = (
         "<svg xmlns='http://www.w3.org/2000/svg' width='340' height='200'>"
         "<text x='10' y='120' transform='rotate(-28 170 100)' "
         "font-family='Montserrat, Helvetica, Arial, sans-serif' font-size='24' "
         f"font-weight='600' fill='#1f5d7a' fill-opacity='0.075' letter-spacing='1'>{text}</text></svg>"
     )
-    return "data:image/svg+xml," + urllib.parse.quote(svg)
+    return "data:image/svg+xml," + urllib.parse.quote(svg), 340, 200
 
 
-def inject(html, watermark_text):
+def inject(html, watermark_text, wm_logo_uri=None):
     wm_css = ""
     wm_div = ""
     if watermark_text:
+        logo_for_wm = wm_logo_uri if _is_en(html) else None  # EN watermark = logo + url
+        uri, tw, th = watermark_uri(watermark_text, logo_for_wm)
         wm_css = (
             "#wm-long{position:absolute;top:0;left:0;width:100%;z-index:9999;"
-            "pointer-events:none;background-repeat:repeat;background-size:340px 200px;"
-            f'background-image:url("{watermark_uri(watermark_text)}")}}'
+            f"pointer-events:none;background-repeat:repeat;background-size:{tw}px {th}px;"
+            f'background-image:url("{uri}")}}'
         )
         wm_div = '<div id="wm-long" aria-hidden="true"></div>'
     head = (
@@ -74,9 +102,9 @@ def inject(html, watermark_text):
     return html
 
 
-def prepare(src_path, watermark_text):
+def prepare(src_path, watermark_text, wm_logo_uri=None):
     with open(src_path, "r", encoding="utf-8") as f:
-        html = inject(f.read(), watermark_text)
+        html = inject(f.read(), watermark_text, wm_logo_uri)
     tmp = src_path + ".long.tmp.html"
     with open(tmp, "w", encoding="utf-8") as f:
         f.write(html)

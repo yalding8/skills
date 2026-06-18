@@ -70,14 +70,37 @@ def data_uri_svg(path):
         return "data:image/svg+xml;base64," + base64.b64encode(f.read()).decode("ascii")
 
 
-def watermark_uri(text):
+def _is_en(html):
+    import re
+    m = re.search(r'<html[^>]*\blang="([^"]+)"', html[:1000], re.I)
+    return bool(m) and m.group(1).lower().startswith("en")
+
+
+def watermark_uri(text, logo_uri=None):
+    """Tiled diagonal watermark. Returns (data_uri, tile_w, tile_h).
+
+    EN variant (logo_uri given) = the uhomes.com wordmark above the url text
+    (brand request 2026-06: EN watermark = English logo + pro.uhomes.com).
+    Default = text-only tile (used for CN)."""
+    if logo_uri:
+        # logo wordmark (viewBox 1600x600 ≈ 2.67:1) faint, with url text below
+        svg = (
+            "<svg xmlns='http://www.w3.org/2000/svg' "
+            "xmlns:xlink='http://www.w3.org/1999/xlink' width='360' height='230'>"
+            "<g transform='rotate(-28 180 115)' opacity='0.085'>"
+            f"<image xlink:href='{logo_uri}' x='66' y='62' width='168' height='63'/>"
+            f"<text x='86' y='150' font-family='Montserrat, Helvetica, Arial, sans-serif' "
+            f"font-size='16' font-weight='600' fill='#1f5d7a' letter-spacing='1'>{text}</text>"
+            "</g></svg>"
+        )
+        return "data:image/svg+xml," + urllib.parse.quote(svg), 360, 230
     svg = (
         "<svg xmlns='http://www.w3.org/2000/svg' width='340' height='200'>"
         "<text x='10' y='120' transform='rotate(-28 170 100)' "
         "font-family='Montserrat, Helvetica, Arial, sans-serif' font-size='24' "
         f"font-weight='600' fill='#1f5d7a' fill-opacity='0.075' letter-spacing='1'>{text}</text></svg>"
     )
-    return "data:image/svg+xml," + urllib.parse.quote(svg)
+    return "data:image/svg+xml," + urllib.parse.quote(svg), 340, 200
 
 
 def header_tpl(title, brand):
@@ -104,13 +127,14 @@ def footer_tpl(logo_uri):
     )
 
 
-def head_inject(watermark_text):
+def head_inject(watermark_text, wm_logo_uri=None):
     wm = ""
     if watermark_text:
+        uri, tw, th = watermark_uri(watermark_text, wm_logo_uri)
         wm = (
             f'#wm-pro{{position:fixed;inset:0;z-index:9999;pointer-events:none;'
-            f'background-image:url("{watermark_uri(watermark_text)}");'
-            f"background-repeat:repeat;background-size:340px 200px}}"
+            f'background-image:url("{uri}");'
+            f"background-repeat:repeat;background-size:{tw}px {th}px}}"
         )
     return f"""
 <style id="pdf-overrides">
@@ -168,10 +192,11 @@ def pdf_params(meta, logo_uri):
     }
 
 
-def prepare(src_path, watermark_text):
+def prepare(src_path, watermark_text, wm_logo_uri=None):
     with open(src_path, "r", encoding="utf-8") as f:
         html = f.read()
-    html = html.replace("</head>", head_inject(watermark_text) + "</head>", 1)
+    logo_for_wm = wm_logo_uri if _is_en(html) else None  # EN watermark = logo + url
+    html = html.replace("</head>", head_inject(watermark_text, logo_for_wm) + "</head>", 1)
     html = html.replace("</body>", BODY_INJECT + "</body>", 1)
     tmp = src_path + ".print.tmp.html"
     with open(tmp, "w", encoding="utf-8") as f:
@@ -258,12 +283,17 @@ def main():
     logo_path = os.path.join(base, logo_path) if logo_path else \
         os.path.join(SKILL_DIR, "assets", "uhomes-logo-red.svg")
     logo_uri = data_uri_svg(logo_path)
+    # watermark logo (EN only): uhomes.com English wordmark, faint + tiled
+    wm_logo_path = cfg.get("watermark_logo")
+    wm_logo_path = os.path.join(base, wm_logo_path) if wm_logo_path else \
+        os.path.join(SKILL_DIR, "assets", "uhomes-logo-red.svg")
+    wm_logo_uri = data_uri_svg(wm_logo_path)
 
     jobs, tmps = [], []
     for r in cfg["reports"]:
         src = os.path.join(base, r["src"])
         out = os.path.join(base, r["out"])
-        tmp, url = prepare(src, watermark)
+        tmp, url = prepare(src, watermark, wm_logo_uri)
         tmps.append(tmp)
         jobs.append((out, url, pdf_params(r, logo_uri)))
     try:
