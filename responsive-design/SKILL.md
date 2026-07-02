@@ -47,9 +47,9 @@ Router file. Core decision rules below are self-sufficient for common cases; rea
 | Problem | Read |
 |---|---|
 | Mobile-first philosophy, breakpoint strategy in depth, fluid container/grid/typography patterns | `references/core-concepts.md` |
-| Flexbox patterns (nav, equal-height cards, media objects) and CSS Grid (named areas, auto-fit/auto-fill, page shells) | `references/flexbox-grid.md` |
-| Advanced media queries (range syntax, orientation, hover/pointer, prefers-reduced-motion/color-scheme, print) and container queries | `references/media-queries.md` |
-| `srcset`/`sizes`, `<picture>` art direction, AVIF/WebP fallbacks, responsive background images, image-set() | `references/responsive-images.md` |
+| Flexbox patterns (responsive nav, flexible cards, sidebar) and CSS Grid (auto-fit minmax, named areas, gallery with spans) | `references/flexbox-grid.md` |
+| Advanced media queries (orientation, hover/pointer, prefers-reduced-motion/color-scheme, print) and container queries | `references/media-queries.md` |
+| `srcset`/`sizes`, `<picture>` art direction, WebP fallbacks, responsive background images | `references/responsive-images.md` |
 | Viewport units (vw/vh/dvh/svh/lvh, mobile pitfalls) and modern functions: clamp(), min(), max(), aspect-ratio | `references/units-and-functions.md` |
 | Critical CSS, lazy loading, performance budget; touch targets, readable text, focus indicators; testing checklist, common pitfalls, tools/docs links | `references/performance-accessibility.md` |
 | Full-page layout examples: Holy Grail, Dashboard, Magazine, Sidebar with toggle, Footer | `references/examples-page-layouts.md` |
