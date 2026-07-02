@@ -90,7 +90,7 @@ PDF/PNG renders blank/animated-out:
 |---|---|
 | `class="rv"` on every animated/reveal block | script adds `.on` to force it visible in PDF |
 | `<span class="bar"><i data-w="46.7"></i></span>` | script sets `i.style.width` from `data-w` so bars fill |
-| `:root` CSS vars `--paper --ink --coral --harbour --sand --line` | print CSS references `var(--paper)` etc. |
+| `:root` CSS vars — legacy `--paper --ink --coral --harbour --sand --line` AND 4-colour `--brand --up --down --data` | print CSS references `var(--paper)` etc.; the 4-colour system drives chart semantics; preflight requires both sets |
 | `.topbar` (page-1 logo lockup) | **visible in print** — holds the report-type logo + issue/date; see logo strategy below |
 | `.masthead` (legacy brand bar) | hidden in print; kept only for backward-compat (use `.topbar` instead) |
 | `section.ch` + `.ch-head` (number + `h2`) | section unit; header kept with its content, never orphaned |
