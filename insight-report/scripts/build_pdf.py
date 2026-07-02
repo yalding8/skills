@@ -39,22 +39,24 @@ HARD-WON DESIGN DECISIONS baked in (do not "simplify" away):
   has class `rv`; every animated bar is `.bar i[data-w="N"]`. An injected script forces them
   to their final state so the static PDF renders fully.
 
+Shared plumbing (watermark, lang detection, Chrome/CDP session, font check) lives in
+scripts/_pdfcommon.py — edit it there, both build scripts pick it up.
+
 Requires: macOS Google Chrome + Python `websockets` (pip install websockets).
 """
 import asyncio
 import base64
 import json
 import os
-import subprocess
 import sys
-import tempfile
 import urllib.parse
-import urllib.request
 
 import websockets
 
-SKILL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+from _pdfcommon import (SKILL_DIR, REVEAL_JS, close_chrome, close_tab, cdp_cmd,
+                        data_uri_svg, esc, is_en, launch_chrome, new_tab,
+                        wait_chrome_up, wait_load, warn_if_fonts_missing, watermark_uri)
+
 PORT = 9333
 
 # --- print geometry (inches) — slim header/footer bands top & bottom ---
@@ -66,45 +68,8 @@ RULE = "#ccbfa8"
 MUTE = "#7c8a90"
 
 
-def data_uri_svg(path):
-    with open(path, "rb") as f:
-        return "data:image/svg+xml;base64," + base64.b64encode(f.read()).decode("ascii")
-
-
-def _is_en(html):
-    import re
-    m = re.search(r'<html[^>]*\blang="([^"]+)"', html[:1000], re.I)
-    return bool(m) and m.group(1).lower().startswith("en")
-
-
-def watermark_uri(text, logo_uri=None):
-    """Tiled diagonal watermark. Returns (data_uri, tile_w, tile_h).
-
-    EN variant (logo_uri given) = the uhomes.com wordmark above the url text
-    (brand request 2026-06: EN watermark = English logo + pro.uhomes.com).
-    Default = text-only tile (used for CN)."""
-    if logo_uri:
-        # logo wordmark (viewBox 1600x600 ≈ 2.67:1) faint, with url text below
-        svg = (
-            "<svg xmlns='http://www.w3.org/2000/svg' "
-            "xmlns:xlink='http://www.w3.org/1999/xlink' width='360' height='230'>"
-            "<g transform='rotate(-28 180 115)' opacity='0.085'>"
-            f"<image xlink:href='{logo_uri}' x='66' y='62' width='168' height='63'/>"
-            f"<text x='86' y='150' font-family='Montserrat, Helvetica, Arial, sans-serif' "
-            f"font-size='16' font-weight='600' fill='#1f5d7a' letter-spacing='1'>{text}</text>"
-            "</g></svg>"
-        )
-        return "data:image/svg+xml," + urllib.parse.quote(svg), 360, 230
-    svg = (
-        "<svg xmlns='http://www.w3.org/2000/svg' width='340' height='200'>"
-        "<text x='10' y='120' transform='rotate(-28 170 100)' "
-        "font-family='Montserrat, Helvetica, Arial, sans-serif' font-size='24' "
-        f"font-weight='600' fill='#1f5d7a' fill-opacity='0.075' letter-spacing='1'>{text}</text></svg>"
-    )
-    return "data:image/svg+xml," + urllib.parse.quote(svg), 340, 200
-
-
 def header_tpl(title, brand):
+    title, brand = esc(title), esc(brand)
     return (
         f'<div style="width:100%;box-sizing:border-box;padding:0 {PAD};font-family:{FONT};'
         f'-webkit-print-color-adjust:exact;">'
@@ -171,18 +136,10 @@ def head_inject(watermark_text, wm_logo_uri=None):
 """
 
 
-BODY_INJECT = """
+BODY_INJECT = f"""
 <div id="wm-pro" aria-hidden="true"></div>
 <script>
-(function(){
-  document.querySelectorAll('.rv').forEach(function(el){el.classList.add('on');});
-  document.querySelectorAll('.bar i').forEach(function(b){
-    if(b.dataset && b.dataset.w){b.style.width=b.dataset.w+'%';}
-  });
-  document.querySelectorAll('.col i').forEach(function(b){
-    if(b.dataset && b.dataset.h){b.style.height=b.dataset.h+'%';}
-  });
-})();
+(function(){{{REVEAL_JS}}})();
 </script>
 """
 
@@ -201,7 +158,7 @@ def pdf_params(meta, logo_uri):
 def prepare(src_path, watermark_text, wm_logo_uri=None):
     with open(src_path, "r", encoding="utf-8") as f:
         html = f.read()
-    logo_for_wm = wm_logo_uri if _is_en(html) else None  # EN watermark = logo + url
+    logo_for_wm = wm_logo_uri if is_en(html) else None  # EN watermark = logo + url
     html = html.replace("</head>", head_inject(watermark_text, logo_for_wm) + "</head>", 1)
     html = html.replace("</body>", BODY_INJECT + "</body>", 1)
     tmp = src_path + ".print.tmp.html"
@@ -210,70 +167,30 @@ def prepare(src_path, watermark_text, wm_logo_uri=None):
     return tmp, "file://" + urllib.parse.quote(tmp)
 
 
-async def _cmd(ws, _id, method, params=None):
-    await ws.send(json.dumps({"id": _id, "method": method, "params": params or {}}))
-    while True:
-        m = json.loads(await ws.recv())
-        if m.get("id") == _id:
-            if "error" in m:
-                raise RuntimeError(f"{method}: {m['error']}")
-            return m.get("result", {})
-
-
 async def _render_one(ws, url, out_path, params):
-    await _cmd(ws, 1, "Page.enable")
-    await ws.send(json.dumps({"id": 2, "method": "Page.navigate", "params": {"url": url}}))
-    while True:
-        m = json.loads(await ws.recv())
-        if m.get("method") == "Page.loadEventFired":
-            break
+    await cdp_cmd(ws, 1, "Page.enable")
+    await wait_load(ws, url)
     await asyncio.sleep(4.0)  # let web fonts settle
-    res = await _cmd(ws, 3, "Page.printToPDF", params)
+    await warn_if_fonts_missing(ws, 8, os.path.basename(out_path))
+    res = await cdp_cmd(ws, 3, "Page.printToPDF", params)
     with open(out_path, "wb") as f:
         f.write(base64.b64decode(res["data"]))
 
 
-def _new_tab():
-    req = urllib.request.Request(f"http://127.0.0.1:{PORT}/json/new?about:blank", method="PUT")
-    return json.loads(urllib.request.urlopen(req, timeout=10).read())
-
-
-def _close_tab(tid):
-    try:
-        urllib.request.urlopen(f"http://127.0.0.1:{PORT}/json/close/{tid}", timeout=10).read()
-    except Exception:
-        pass
-
-
 async def _run(jobs):
-    udd = tempfile.mkdtemp(prefix="cdp-chrome-")
-    proc = subprocess.Popen(
-        [CHROME, "--headless=new", "--disable-gpu", "--no-sandbox", "--no-first-run",
-         "--no-default-browser-check", f"--remote-debugging-port={PORT}",
-         "--remote-allow-origins=*", f"--user-data-dir={udd}", "about:blank"],
-        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-    )
+    proc = launch_chrome(PORT, "cdp-chrome-")
     try:
-        for _ in range(100):
-            try:
-                urllib.request.urlopen(f"http://127.0.0.1:{PORT}/json/version", timeout=1).read()
-                break
-            except Exception:
-                await asyncio.sleep(0.1)
+        await wait_chrome_up(proc, PORT)
         for out_path, url, params in jobs:
-            tab = _new_tab()
+            tab = new_tab(PORT)
             try:
                 async with websockets.connect(tab["webSocketDebuggerUrl"], max_size=None) as ws:
                     await _render_one(ws, url, out_path, params)
                 print(f"OK  -> {out_path}  ({os.path.getsize(out_path) // 1024} KB)")
             finally:
-                _close_tab(tab["id"])
+                close_tab(PORT, tab["id"])
     finally:
-        proc.terminate()
-        try:
-            proc.wait(timeout=10)
-        except Exception:
-            proc.kill()
+        close_chrome(proc)
 
 
 def main():
@@ -281,8 +198,13 @@ def main():
         sys.exit("usage: build_pdf.py <config.json>")
     cfg_path = os.path.abspath(sys.argv[1])
     base = os.path.dirname(cfg_path)
-    with open(cfg_path, encoding="utf-8") as f:
-        cfg = json.load(f)
+    try:
+        with open(cfg_path, encoding="utf-8") as f:
+            cfg = json.load(f)
+    except FileNotFoundError:
+        sys.exit(f"ERROR: config not found: {cfg_path}")
+    except json.JSONDecodeError as e:
+        sys.exit(f"ERROR: config is not valid JSON: {cfg_path} ({e})")
 
     watermark = cfg.get("watermark", "Pro.uhomes.com")
     logo_path = cfg.get("logo")
@@ -296,12 +218,16 @@ def main():
     wm_logo_uri = data_uri_svg(wm_logo_path)
 
     jobs, tmps = [], []
-    for r in cfg["reports"]:
+    for r in cfg.get("reports", []):
         src = os.path.join(base, r["src"])
+        if not os.path.isfile(src):
+            sys.exit(f"ERROR: src HTML not found: {src}")
         out = os.path.join(base, r["out"])
         tmp, url = prepare(src, watermark, wm_logo_uri)
         tmps.append(tmp)
         jobs.append((out, url, pdf_params(r, logo_uri)))
+    if not jobs:
+        sys.exit("ERROR: config has no reports[]")
     try:
         asyncio.run(_run(jobs))
     finally:
