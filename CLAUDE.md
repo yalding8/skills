@@ -15,14 +15,24 @@
 - 所有 skill 必须归类到对应分组中
 
 ## Skill 分类体系
+> 与 `sync-skills.sh` 中的分类数组保持一致；改分类时先改脚本，再回写本节。
+
 1. **规划与设计** — PRD、拆分、评审、接口设计
-2. **开发** — TDD、重构、架构改进、问题诊断
-3. **工具与配置** — Git hooks、pre-commit、格式化
-4. **写作与知识** — 技能编写、文章编辑、Obsidian
-5. **前端设计 (Impeccable)** — 21 个设计词汇技能
-6. **营销与增长** — 文案、SEO、广告、邮件、社媒
-7. **转化优化 (CRO)** — 页面、表单、注册、弹窗、定价
-8. **收入运营** — 销售赋能、流失防控、推荐计划、RevOps
+2. **开发** — TDD、重构、架构改进、小程序开发
+3. **工具与效率** — Git hooks、pre-commit、溯源、IPFS 发布、Obsidian
+4. **前端设计 (Impeccable)** — 21 个设计词汇技能
+5. **前端工程** — 移动端、响应式、Web 性能、平台能力门禁
+6. **Cloudflare 开发** — Workers、Wrangler、Durable Objects、Agents/Sandbox SDK
+7. **认知与写作** — ljg 思维工具、写作引擎、技能编写
+8. **视觉铸造** — ljg 卡片、归藏社交卡片/PPT
+9. **营销与增长** — 文案、广告、邮件、社媒、公众号发布
+10. **SEO 与搜索** — 审计、AI SEO、结构化数据、站点架构
+11. **转化与变现** — CRO、定价、流失防控、推荐计划、RevOps
+12. **飞书 Lark** — lark-* 全家桶（文档、表格、消息、日历、审批等）
+13. **企业微信 WeCom** — wecomcli-* 系列
+14. **业务工作流** — insight-report、interview-copilot 等业务专用流程
+
+共享库（如 `_feishu-core`，无 SKILL.md）不列入 README 分类表。
 
 ## 命名规范
 - 目录名 = skill 名，全小写 kebab-case
