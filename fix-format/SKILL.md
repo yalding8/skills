@@ -1,3 +1,8 @@
+---
+name: fix-format
+description: 检查并修正代码片段的格式错误 — heredoc 顶格、YAML/Compose 缩进、Python/Shell/JS 缩进、.env 格式。当用户贴出部署脚本、配置文件、heredoc 块要求检查格式，或说"修格式"、"格式不对"、"/fix-format"时使用。输出问题清单 + 可直接复制的修正版。
+---
+
 # 格式修正 Skill
 
 检查用户提供的代码片段（通常是部署脚本、配置文件、heredoc 块等），识别并修正所有格式错误，输出可直接复制使用的修正版本。

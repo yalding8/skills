@@ -30,7 +30,14 @@ from pathlib import Path
 
 # 加载共享 lib
 sys.path.insert(0, str(Path(__file__).parent.parent / "_feishu-core"))
-import feishu_lib as fs
+try:
+    import feishu_lib as fs
+except ModuleNotFoundError:
+    sys.exit(
+        "缺少共享库 _feishu-core（feishu-wiki 依赖它运行）。\n"
+        "修复：把仓库里的 _feishu-core/ 目录安装到 ~/.claude/skills/_feishu-core/\n"
+        "来源：https://github.com/yalding8/skills/tree/main/_feishu-core"
+    )
 
 
 SKILL_NAME = "wiki"
