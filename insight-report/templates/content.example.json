@@ -1,5 +1,5 @@
 {
-  "__doc__": "ANNOTATED EXAMPLE content JSON for build_report.py. Copy this, rename to content.cn.json / content.en.json, edit the values, then: python3 scripts/build_report.py content.cn.json. Keys prefixed __ are comments and are ignored by the renderer ONLY if you delete them — string.Template does not strip them, so REMOVE all __* keys in your real file. (Real working copies live next to the Cardiff report: cardiff-2026/content.cn.json / content.en.json.)",
+  "__doc__": "ANNOTATED EXAMPLE content JSON for build_report.py. Copy this, rename to content.cn.json / content.en.json, edit the values, then: python3 scripts/build_report.py content.cn.json. Keys prefixed __ are comments; the renderer reads only known keys and ignores the rest, so __* keys are harmless at build time — still DELETE them in your real file so future key renames can't silently collide and the file stays readable. (Real working copies live next to the Cardiff report: cardiff-2026/content.cn.json / content.en.json.)",
 
   "lang": "cn",
   "__lang": "'cn' or 'en'. Picks the built-in typography preset (fonts, sizes, quote glyph). CN uses Alibaba PuHuiTi; EN uses Montserrat. This is the ONLY thing that switches the whole look — you never touch CSS.",
@@ -10,8 +10,7 @@
   "__style": "OPTIONAL. A dict of CSS-value overrides on top of the preset, e.g. {\"hero_h1_size\":\"clamp(40px,7vw,80px)\"}. Omit entirely unless you must deviate. See PRESET_CN/PRESET_EN keys in build_report.py for the full list.",
 
   "head": {
-    "lang_attr": "zh-CN",
-    "__lang_attr": "<html lang=...> value. Defaults zh-CN for cn / en for en.",
+    "__lang_attr": "OPTIONAL <html lang=...> override. LEAVE IT OUT — it defaults zh-CN for cn / en for en, and build_pdf/build_longimage read <html lang> to pick the watermark language. A stale hardcoded value (e.g. zh-CN left in an EN copy) silently gives the EN report a CN text-only watermark.",
     "meta_description": "...SEO description...",
     "keywords": "...OPTIONAL comma-separated SEO/social tags, e.g. 'QS 2027, World University Rankings, Study-Abroad'. Omit to leave the keywords meta empty...",
     "og_title": "...social share title...",
@@ -20,7 +19,7 @@
   },
 
   "topbar": {
-    "__logo": "Logo is AUTO by lang — leave it out. EN→uhomes.com only (uhomes-logo-red.svg); CN→3-brand combined 异乡好居｜异乡缴费｜异乡人才 (uhomes-cn-combined-logo.svg). Keep the relevant svg alongside the output so it shows in print. Override only for university/apartment reports via logo_src (single img) or logo_html (full custom).",
+    "__logo": "Logo is AUTO by lang — leave it out. EN→uhomes.com only (uhomes-logo-red.svg); CN→3-brand combined 异乡好居｜异乡缴费｜异乡人才 (uhomes-cn-combined-logo.svg). The logo is EMBEDDED into the HTML as a data: URI, so the generated .html is self-contained — no svg needs to be shipped alongside. Override only for university/apartment reports via logo_src (single img, path relative to this JSON; embedded too; add logo_alt for its alt text) or logo_html (full custom markup).",
     "issue": "卡迪夫市场观察<br>2026 年 6 月",
     "__issue": "right-aligned issue line; <br> allowed."
   },
@@ -45,19 +44,19 @@
     { "b": "−2.5%", "span": "...", "sub": "..." },
     { "b": "#17 | 8.7%", "span": "...", "sub": "...", "tone": "neg", "icon": "bars" }
   ],
-  "__stats": "the headline stat CARDS (brand review 2026-06-18, designer mockup): each card = a coloured circular ICON BADGE + big semantic number + bold title (span) + muted subtitle (sub). Exactly 4. Colour is SEMANTIC by sign: leading + → growth green (↑ badge), leading − → decline red (↓ badge), UNSIGNED → neutral ink (bars badge). Override colour with \"tone\":\"pos\"|\"neg\"|\"neutral\" (e.g. a bad rank like #17 → \"neg\" to make it red). Override the glyph with \"icon\":\"up\"|\"down\"|\"bars\"|\"globe\"|\"flat\". \"sub\" is the optional second caption line. A trailing % in b is auto-shrunk. Don't mix a signed delta with a bare ratio (\"7 / 8\") in the strip — rewrite as a big count.",
+  "__stats": "the headline stat CARDS (brand review 2026-06-18, designer mockup): each card = a coloured circular ICON BADGE + big semantic number + bold title (span) + muted subtitle (sub). Exactly 4 (the layout is a 4-column strip; other counts render but break the grid rhythm — the builder warns). Colour is SEMANTIC by sign: leading + → growth green (↑ badge), leading − → decline red (↓ badge), UNSIGNED → neutral ink (bars badge). Override colour with \"tone\":\"pos\"|\"neg\"|\"neutral\" (e.g. a bad rank like #17 → \"neg\" to make it red). Override the glyph with \"icon\":\"up\"|\"down\"|\"bars\"|\"globe\"|\"flat\". \"sub\" is the optional second caption line. A trailing % in b is auto-shrunk. Don't mix a signed delta with a bare ratio (\"7 / 8\") in the strip — rewrite as a big count.",
 
   "chapters": [
     {
       "num": "01",
-      "h2": "章节标题",
+      "h2": "章节标题（column 时间对比示例）",
       "sub": "章节副标题（可选）",
       "blocks": [
         {
           "type": "chart",
           "ct": "图表标题（中性小字）",
           "cn2": "图表副说明（灰色小字）",
-          "__variant": "CHART TYPE (default 'bar'). Match the form to the question: 'line'=trend over time; 'donut'=share/proportion; 'column'=vertical bars for a time comparison; 'bar'=ranking (horizontal). Add \"diverging\":true to a bar chart so NEGATIVE values show (extend left in decline-red). See REFERENCE §Chart variants.",
+          "__variant": "CHART TYPE (default 'bar'). Match the form to the question: 'line'=trend over time; 'donut'=share/proportion ('pie' is an alias); 'column'=vertical bars for a time comparison; 'bar'=ranking (horizontal). Add \"diverging\":true to a bar chart so NEGATIVE values show (extend left in decline-red). Chapters 01–05 below demonstrate one variant each. See REFERENCE §Chart variants.",
           "variant": "column",
           "mode": "scale",
           "__mode": "BAR HELPER MODE (variant 'bar'/'column' only). 'scale' (default): data-w=value/max*scale. 'percent': data-w=value, printed N%. 'raw_w': you give w+value_text, no math, for hand-tuned YoY-% bars.",
@@ -68,7 +67,7 @@
             { "label": "2022", "value": 655 },
             { "label": "2025", "value": 314 }
           ],
-          "__bars": "Each row: label + value. COLOUR IS SEMANTIC (4-colour system, brand review 2026-06-18): default = neutral grey; hl:true → THE highlighted/subject bar (brand #FF5A5F, bold label); up:true → growth green; neg:true OR value<0 → decline red (in a normal bar the width zeroes; in a 'diverging' bar it extends LEFT). value_text overrides the printed cell ('+22%','2.0万'). w = explicit data-w (REQUIRED for raw_w). DO NOT use the legacy style:'coral'/'sand'/'ink' classes — preflight WARNs. For 'line': rows are ordered points (hl/down mark a dot). For 'donut': rows are slices (hl = brand slice); add \"center\":{\"value\":\"47%\",\"label\":\"…\"}."
+          "__bars": "Each row: label + value. COLOUR IS SEMANTIC (4-colour system, brand review 2026-06-18): default = neutral grey; hl:true → THE highlighted/subject bar (brand #FF5A5F, bold label); up:true → growth green; neg:true OR value<0 → decline red (in a normal bar the width zeroes; in a 'diverging' bar it extends LEFT). value_text overrides the printed cell ('+22%','2.0万'). w = explicit data-w (ONLY for raw_w mode — in scale/percent it bypasses the math, the builder warns, and preflight FAILs on >100). DO NOT use the legacy style:'coral'/'sand'/'ink' classes — preflight WARNs. For 'line': rows are ordered points (hl=brand dot, down=red dot, up=green dot). For 'donut': rows are slices (hl = brand slice; up/down tint a slice green/red); add \"center\":{\"value\":\"47%\",\"label\":\"…\"}."
         },
         {
           "type": "note",
@@ -92,6 +91,83 @@
       "__pull_quote": "OPTIONAL. Rendered after the chapter blocks (inv 9: coral quote mark + cite)."
     },
     {
+      "num": "02",
+      "h2": "趋势示例（line）",
+      "blocks": [
+        {
+          "type": "chart",
+          "ct": "近五年走势",
+          "variant": "line",
+          "bars": [
+            { "label": "2021", "value": 746 },
+            { "label": "2022", "value": 655 },
+            { "label": "2023", "value": 512, "down": true },
+            { "label": "2024", "value": 430 },
+            { "label": "2025", "value": 314, "hl": true }
+          ],
+          "__note": "line = ordered points; hl marks the subject dot (brand), down marks a decline dot (red), up marks a growth dot (green)."
+        }
+      ]
+    },
+    {
+      "num": "03",
+      "h2": "占比示例（donut）",
+      "blocks": [
+        {
+          "type": "chart",
+          "ct": "渠道构成",
+          "variant": "donut",
+          "center": { "value": "47%", "label": "主渠道占比" },
+          "bars": [
+            { "label": "主渠道", "value": 47, "hl": true },
+            { "label": "渠道 B", "value": 31 },
+            { "label": "渠道 C", "value": 22 }
+          ]
+        }
+      ]
+    },
+    {
+      "num": "04",
+      "h2": "占比条 + 手调宽度示例（percent / raw_w）",
+      "blocks": [
+        {
+          "type": "chart",
+          "ct": "转化率（percent 模式：data-w=value，打印 N%）",
+          "mode": "percent",
+          "bars": [
+            { "label": "本科", "value": 76, "hl": true },
+            { "label": "硕士", "value": 61 }
+          ]
+        },
+        {
+          "type": "chart",
+          "ct": "同比涨幅（raw_w 模式：宽度手调、文字另给）",
+          "mode": "raw_w",
+          "bars": [
+            { "label": "全英", "w": 80, "value_text": "+22%", "hl": true },
+            { "label": "本市", "w": 30, "value_text": "+6%" }
+          ]
+        }
+      ]
+    },
+    {
+      "num": "05",
+      "h2": "含负值排名示例（diverging）",
+      "blocks": [
+        {
+          "type": "chart",
+          "ct": "各城市同比（负值向左伸出，红色）",
+          "diverging": true,
+          "bars": [
+            { "label": "曼城", "value": 101, "value_text": "+101%" },
+            { "label": "利兹", "value": 38, "value_text": "+38%", "hl": true },
+            { "label": "卡迪夫", "value": -16, "value_text": "−16%" }
+          ],
+          "__note": "diverging requires real signed numeric value (left/right computed from max(|value|)); value_text is the printed label."
+        }
+      ]
+    },
+    {
       "num": "06",
       "h2": "结论与方向建议",
       "sub": "...",
@@ -110,7 +186,7 @@
 
   "footer": {
     "brand": "异乡好居",
-    "__brand": "EN can use 'uhomes<em>.com</em>' to color '.com' coral.",
+    "__brand": "EN can use 'uhomes<em>.com</em>' to color '.com' coral. Injected as RAW HTML — brand names can be clickable <a> links (live in HTML/PDF, not the long PNG).",
     "note": "数据来源... (可含 <code>table_name</code>) ...仅供内部决策参考。",
     "__note": "footer fine print, rendered at 10px (inv 4). Inline <code> allowed.",
     "tag": "卡迪夫市场观察 · 2026"

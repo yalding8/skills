@@ -34,10 +34,15 @@ USAGE
     python3 preflight.py report.config.json
 
 Reads the `reports[]` array from the config (same schema as build_pdf.py). For each
-report it lints `src` (HTML, required) and, if present beside it, the matching
-`out` PDF and any `*-long.pdf` long-image PDF. Paths resolve relative to the config dir.
+report it lints `src` (HTML, required) and, if present, the matching `out` PDF and the
+`*-long.pdf` long-image PDF (looked up in the config dir — where build_longimage.py
+writes — then beside the src; a per-report `longpdf` key overrides). Paths resolve
+relative to the config dir. NOTE the only raster check (a4-ragged-whitespace) is
+inter-page, so it applies to the A4 PDF; the single-page long PDF/PNG get static
+checks only (they share the same src HTML).
 
-Exit code: 0 if no report has a FAIL, 1 if any report has at least one FAIL.
+Exit codes: 0 = no FAIL; 1 = at least one report has a FAIL; 2 = usage/config error
+(bad args, config missing/unparsable, empty reports[]).
 """
 
 import json
@@ -70,7 +75,10 @@ class Result:
 def _strip_style_blocks(html):
     """Return (html_without_style, concatenated_css). We need the body markup with the
     <style> content removed so that CSS rule selectors like `.bignum{}` don't get
-    mistaken for element class usage."""
+    mistaken for element class usage. HTML comments are stripped FIRST so commented-out
+    markup (e.g. an old `data-w="120"` bar) can't trigger checks — a commented data-w
+    used to raise a false FAIL-level bar-overflow."""
+    html = re.sub(r"<!--.*?-->", "", html, flags=re.S)
     css_parts = re.findall(r"<style[^>]*>(.*?)</style>", html, re.S | re.I)
     body_only = re.sub(r"<style[^>]*>.*?</style>", "", html, flags=re.S | re.I)
     # also drop <script> blocks from the markup-class scan (they can contain class names
