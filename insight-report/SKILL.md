@@ -1,6 +1,6 @@
 ---
 name: insight-report
-description: End-to-end pipeline for uhomes market-research / channel insight reports — frame a hypothesis, organize a survey, analyze the data, produce a magazine-style bilingual HTML report, and export a watermarked, print-ready PDF with a professional running header/footer. Use when the user wants to create a market insight or 调研/洞察 report, turn survey or DB data into a report, build an HTML insight page, or export a branded watermarked PDF — triggers include "insight", "洞察", "调研报告", "市场调研", "出一份报告", "加水印 PDF", "insight 报告".
+description: Use when the user wants a uhomes market-research / channel insight report (调研/洞察报告), wants to turn survey or DB data into a magazine-style bilingual report, build an HTML insight page, or export a branded watermarked 长图/PDF — triggers include "insight", "洞察", "调研报告", "市场调研", "出一份报告", "加水印 PDF", "insight 报告", "长图".
 ---
 
 # Insight Report
@@ -40,8 +40,9 @@ Produces a uhomes-branded insight report across five stages. Stages 1–3 are me
      ```bash
      python3 ~/.claude/skills/insight-report/scripts/build_longimage.py report.config.json
      ```
-     Emits BOTH `<src>-long.png` (raster 长图) AND `<src>-long.pdf` (single-page vector PDF). Keys:
-     `width` (default 1200), `scale` (PNG DPR, default 2), shares `watermark`.
+     Emits BOTH `<src>-long.png` (raster 长图) AND `<src>-long.pdf` (single-page vector PDF),
+     written into the config file's directory. Keys: `width` (default 1200), `scale` (PNG DPR,
+     default 2), shares `watermark`; per-report `long`/`longpdf` override the output names.
    - **A4 PDF** (paginated, watermark + running header/footer) — formal/print only:
      ```bash
      python3 ~/.claude/skills/insight-report/scripts/build_pdf.py report.config.json
@@ -83,16 +84,20 @@ Before exporting/shipping, run preflight on the report config — this is a hard
 python3 ~/.claude/skills/insight-report/scripts/preflight.py report.config.json
 ```
 
-- **FAIL must be zero** (`bar-overflow`: any `data-w > 100`). Non-zero exit = do not ship, fix first.
+- **FAIL must be zero**. Two FAIL sources: `bar-overflow` (any `data-w > 100`) and `config`
+  (report entry missing `src`, or src HTML not found). Non-zero exit = do not ship, fix first.
 - **Every ⚠️ WARN must be eyeballed** — WARN ≠ ignorable; it's "machine can't be sure, human must judge."
   WARNs map to defects this skill historically shipped only because a human caught them:
   `billboard-bignum` (big number → `.note .fig` inline) · `waffle` (→ `.bar-row`) · `footer-fontsize`
-  (~10px) · `cols-single-column` (must be stacked) · `topbar` (visible; legacy `.masthead`
-  display:none) · `title-orphan` (`<h1>` fragments ≤9 CJK chars) · `bar-color-discipline` (no legacy
-  positional `coral/sand/ink` bar classes — use the 4-colour `hl/up/neg`) · `render-contract`
-  (`.bar`>`<i data-w>`, `.rv`, `:root` vars) · `a4-ragged-whitespace` (non-last page >35% empty bottom).
-- Order: build PDF/long → run preflight (raster checks need the PDF present) → FAIL=0 + WARN reviewed
-  → only then push/archive. Report "preflight FAIL=0, N WARN reviewed" in the delivery summary.
+  (WARNs above 11px; the design norm is ~10px) · `cols-single-column` (must be stacked) · `topbar`
+  (visible; legacy `.masthead` display:none) · `title-orphan` (`<h1>` fragments ≤9 CJK chars) ·
+  `bar-color-discipline` (no legacy positional `coral/sand/ink` bar classes — use the 4-colour
+  `hl/up/neg`) · `render-contract` (`.bar`>`<i data-w>`, `.rv`, `:root` vars) · `a4-ragged-whitespace`
+  (non-last page >35% empty bottom).
+- Order: build PDF/long → run preflight (the raster check needs the A4 PDF present) → FAIL=0 + WARN
+  reviewed → only then push/archive. Report "preflight FAIL=0, N WARN reviewed" in the delivery
+  summary. Note the only raster check (inter-page whitespace) applies to the **A4 PDF**; the long
+  PNG/PDF is a single tall page, so it is covered by the static checks on the same src HTML.
 
 ## Conventions (always)
 
@@ -140,8 +145,9 @@ python3 ~/.claude/skills/insight-report/scripts/preflight.py report.config.json
 - **One report = one dedicated output folder (NEVER mix with other reports).** Before Stage 4,
   create a fresh folder named for this report (e.g. `<topic>-报告/` or `report-<topic>-YYYY-MM/`) and
   write EVERYTHING into it: `content.<lang>.json`, the generated `.html`, `report.config.json`, and all
-  build outputs (`*-long.png/pdf`, A4 `*.pdf`). Run the build/preflight scripts from inside that folder
-  (config paths are relative). Do NOT drop new files alongside a previous report's files in a shared
+  build outputs (`*-long.png/pdf`, A4 `*.pdf`). All config paths resolve relative to the **config
+  file's directory** (not your cwd), so keeping everything in one folder keeps it self-contained
+  wherever you run the scripts from. Do NOT drop new files alongside a previous report's files in a shared
   directory — co-mingling makes `report.config.json` ambiguous, lets `build_*`/`preflight` pick up stale
   siblings, and makes handoff a guessing game. If asked to extend an existing report set, still give the
   new report its own subfolder. The archive `ANALYSIS_*.md` (below) is the only file that may live in the

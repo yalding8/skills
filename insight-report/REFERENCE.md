@@ -75,8 +75,10 @@ Each chart carries `"bars": [...]`; each row `{label, value, ...}`. The helper c
 - `mode: "raw_w"` — you give `w` + `value_text`; helper does no math; for YoY charts where bar length
   is a hand-tuned visual code decoupled from the printed % (country / peer-city exhibits).
 - Row keys: `label`(req) / `value` / `value_text`(override printed value, e.g. `+22%`) / `w`(explicit
-  width) / `style`(`""|coral|sand|ink`) / `hl`(highlight row) / `neg`(force negative style).
-  **Any value<0 or w<0 → width 0, value printed red `.neg`, minus sign kept.**
+  width — **raw_w only**; in scale/percent it bypasses the math and the builder WARNs) /
+  `style`(`""|coral|sand|ink`, deprecated) / `hl`(highlight row) / `neg`(force negative style).
+  **Any value<0 or w<0 → width 0, value printed red `.neg`, minus sign kept.** The builder also
+  WARNs on any resulting `data-w > 100` (preflight FAILs on it).
 
 ## HTML render contract (Stage 4 output)
 
@@ -150,8 +152,8 @@ exhibit is arguing — brand review called out using horizontal bars for everyth
 
 | variant | use for | data shape | colour |
 |---|---|---|---|
-| `"line"` | a **trend** over time | `bars:[{label,value,hl?,down?,up?}]` (ordered points) | ink line + faint brand area; per-point dot — `hl`=brand, `down`=red, else neutral |
-| `"donut"` | a **share / proportion** | `bars:[{label,value,hl?}]`; optional `center:{value,label}` | highlighted slice=brand, rest=neutral greys |
+| `"line"` | a **trend** over time | `bars:[{label,value,hl?,down?,up?}]` (ordered points) | ink line + faint brand area; per-point dot — `hl`=brand, `down`=red, `up`=green, else neutral |
+| `"donut"` (alias `"pie"`) | a **share / proportion** | `bars:[{label,value,hl?,up?,down?}]`; optional `center:{value,label}` | highlighted slice=brand, `up`/`down` tint a slice green/red, rest=neutral greys |
 | `"column"` | a **time comparison** (few periods) | `bars:[{label,value,hl?/up?/down?}]` | default grey + ONE `hl` (subject) — "全灰，只突出一条红色" |
 | `"bar"` (default) | a **ranking** | `bars:[…]` with `mode` scale/percent/raw_w | default grey + ONE `hl`; legacy `style` deprecated |
 | `"bar"` + `"diverging":true` | a ranking **with negatives** | `bars:[{label,value (signed numeric),value_text}]` | + right (grey/`hl`), − **left in `--down` red** around a centre axis |
@@ -173,14 +175,15 @@ SVG. Worked examples: the Cardiff report — 01 line, 02 donut, 03 column, 04 ba
 
 The generator picks this from `lang`; leave `content.topbar` with just `issue` (no `logo_src`).
 
-**Override — by report type** (set `content.topbar.logo_src` or `logo_html` to override the rule;
-for single-school / property reports the footer corner mark stays uhomes):
+**Override — by report type** (set `content.topbar.logo_src` — plus optional `logo_alt` for its
+alt text — or `logo_html` to override the rule; for single-school / property reports the footer
+corner mark stays uhomes):
 - **University** deep-dive → that university's logo (`logo_src`) + "× uhomes".
 - **Apartment / property** → that apartment brand's logo + "× uhomes".
 
 `.topbar` stays visible in print (unlike `.masthead`). The CDP running header (thin text
 title/brand) still repeats on interior pages for continuity. Assets: `uhomes-logo-red.svg`
-(uhomes.com), `uhomes-cn-logo-red.svg` (异乡好居), + white variants for dark backgrounds.
+(uhomes.com), `uhomes-cn-combined-logo.svg` (三品牌组合标), + white variants for dark backgrounds.
 
 **Wordmark sizing (do not "fix" by inflating the box).** `uhomes-logo-red.svg` is **tight-cropped**
 (`viewBox="98 214 1404 172"`) — the original Adobe export had `viewBox="0 0 1600 600"` with ~74%
@@ -204,15 +207,22 @@ the stacked/de-boxed redesign.)
 ```json
 {
   "watermark": "Pro.uhomes.com",          // "" to disable; tiled diagonal text
-  "logo": "assets/uhomes-logo-red.svg",    // optional; footer corner mark; default = skill's red wordmark
+  "logo": "assets/uhomes-logo-red.svg",    // optional; footer corner mark; default = skill's red wordmark (build_pdf only)
   "watermark_logo": "assets/uhomes-logo-red.svg", // optional; EN watermark logo; default = uhomes.com wordmark
+  "width": 1200,                           // optional; long-image viewport CSS px (build_longimage only)
+  "scale": 2,                              // optional; long-PNG device pixel ratio (build_longimage only)
   "reports": [
-    { "src": "report-cn.html", "out": "Report-CN.pdf", "title": "<header left>", "brand": "<header right>" }
+    { "src": "report-cn.html",             // input HTML (both scripts)
+      "out": "Report-CN.pdf",              // A4 PDF output (build_pdf only)
+      "title": "<header left>", "brand": "<header right>",   // running header (build_pdf only)
+      "long": "custom-long.png", "longpdf": "custom-long.pdf" } // optional name overrides (build_longimage only)
   ]
 }
 ```
 
-Paths resolve relative to the config file's directory. Run:
+One config drives both scripts; each reads its own keys (annotated above) and ignores the rest.
+Long outputs default to `<src-stem>-long.png/pdf` in the config dir. Paths resolve relative to
+the config file's directory. Run:
 `python3 <skill>/scripts/build_pdf.py report.config.json`
 
 **Watermark is language-aware** (brand request 2026-06, both `build_pdf.py` and `build_longimage.py`):
@@ -220,8 +230,10 @@ Paths resolve relative to the config file's directory. Run:
   faint ~8.5% opacity) **above** the `watermark` url text — i.e. "English logo + pro.uhomes.com".
 - **CN report** (any non-`en` lang) → tile = **text-only** (`watermark` string), no logo.
 
-Detection is automatic from the HTML `lang` attr; no per-report config needed. Override the watermark
-logo via the top-level `watermark_logo` key.
+Detection is automatic from the HTML `lang` attr (double/single/unquoted accepted, scanned in the
+first 4000 chars); no per-report config needed. Override the watermark logo via the top-level
+`watermark_logo` key. ⚠️ A stale `head.lang_attr` in the content JSON (e.g. `zh-CN` left in an EN
+copy) defeats this — leave `lang_attr` out and let `lang` derive it.
 
 ### Why it's built this way (do not "simplify" these away)
 
@@ -244,6 +256,10 @@ logo via the top-level `watermark_logo` key.
 ### Dependencies & gotchas
 
 - macOS Google Chrome at the hard-coded path; Python `websockets` (`pip install websockets`).
+- Shared plumbing (watermark SVG, lang detection, Chrome/CDP session, escaping, brand-font check)
+  lives in `scripts/_pdfcommon.py` — both build scripts import it; edit watermark/lang behaviour
+  there once. The scripts print a `WARN` when the CDN brand fonts fail to load (offline builds
+  silently fell back to system fonts before).
 - The script launches headless Chrome with `--remote-debugging-port=9333`; if a stale instance
   lingers, `pkill -f "remote-debugging-port=9333"` before re-running.
 - It waits 4s after load for web fonts (PuHuiTi/Montserrat) to settle — networked fonts need this.
