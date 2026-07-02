@@ -305,18 +305,20 @@ def check_render_contract(body, css, out):
     Missing -> WARN (PDF will render blank/animated-out)."""
     problems = []
 
-    # every bar-row containing a .bar should carry an <i data-w> (horizontal bars fill via the
-    # reveal script). Scan the whole bar-row, NOT just the first </span> after .bar — diverging
-    # bars nest <span class="track"> inside .bar, which mis-fired the old non-greedy capture.
+    # every element carrying class token "bar" should be followed by an <i data-w> (horizontal
+    # bars fill via the reveal script). Anchor on the .bar element itself and scan a lookahead
+    # window — the old approach captured the bar-row up to the FIRST </div>, so a nested <div>
+    # inside a row silently truncated the capture and missing data-w went undetected.
     # (Column charts use .col + <i data-h>, line/donut are SVG — none carry .bar, so none flagged.)
-    rows = re.findall(r'<div[^>]*\bclass\s*=\s*["\'][^"\']*\bbar-row\b[^"\']*["\'][^>]*>(.*?)</div>',
-                      body, re.S | re.I)
-    rows_missing = sum(1 for inner in rows
-                       if re.search(r'class\s*=\s*["\'][^"\']*\bbar\b', inner, re.I)
-                       and not re.search(r"<i[^>]*\bdata-w\b", inner, re.I))
-    if rows and rows_missing:
-        problems.append("{}/{} 个 bar-row 的 .bar 缺少 <i data-w=…>（打印时不会填充）"
-                        .format(rows_missing, len(rows)))
+    bar_total = bar_missing = 0
+    for m in re.finditer(r'<\w+[^>]*\bclass\s*=\s*["\']([^"\']*)["\'][^>]*>', body, re.I):
+        if "bar" in m.group(1).split():
+            bar_total += 1
+            if not re.search(r"<i[^>]*\bdata-w\b", body[m.end():m.end() + 600], re.I):
+                bar_missing += 1
+    if bar_missing:
+        problems.append("{}/{} 个 .bar 附近未发现 <i data-w=…>（打印时不会填充）"
+                        .format(bar_missing, bar_total))
 
     # .rv must exist as an element class (the PDF script forces .rv.on visible)
     if not _has_element_class(body, "rv"):
@@ -327,7 +329,10 @@ def check_render_contract(body, css, out):
     rm = re.search(r":root\s*\{([^{}]*)\}", css, re.S)
     if rm:
         root_block = rm.group(1)
-    required_vars = ["--paper", "--coral", "--ink", "--harbour", "--sand", "--line"]
+    # legacy palette (print-CSS overrides reference these) + the 4-colour semantic system
+    # (brand review 2026-06-18); the current template declares both sets.
+    required_vars = ["--paper", "--coral", "--ink", "--harbour", "--sand", "--line",
+                     "--brand", "--up", "--down", "--data"]
     missing_vars = [v for v in required_vars if v not in root_block]
     if not rm:
         problems.append(":root 变量块缺失（print CSS 引用 var(--paper) 等会失效）")
@@ -505,27 +510,39 @@ def lint_report(report, cfg_dir):
     check_legacy_bar_colors(body, css, results)
     check_render_contract(body, css, results)
 
-    # locate matching PDF(s): the configured `out`, plus any *-long.pdf beside the src
+    # locate matching PDF(s): the configured `out`, plus the *-long.pdf long-image PDF.
+    # build_longimage.py writes long outputs into the CONFIG dir (honouring per-report
+    # `long`/`longpdf` overrides), so look there first, then beside the src (legacy layouts).
     pdf_candidates = []
     out_pdf = report.get("out")
     if out_pdf:
         op = out_pdf if os.path.isabs(out_pdf) else os.path.join(cfg_dir, out_pdf)
         if os.path.isfile(op):
             pdf_candidates.append(op)
-    # long-image PDF: <src-stem>-long.pdf next to the html
     stem = os.path.splitext(os.path.basename(src_path))[0]
-    long_pdf = os.path.join(os.path.dirname(src_path), stem + "-long.pdf")
-    if os.path.isfile(long_pdf):
+    long_names = [report.get("longpdf") or (stem + "-long.pdf")]
+    long_pdf = None
+    for nm in long_names:
+        for base in (cfg_dir, os.path.dirname(src_path)):
+            p = nm if os.path.isabs(nm) else os.path.join(base, nm)
+            if os.path.isfile(p):
+                long_pdf = p
+                break
+        if long_pdf:
+            break
+    if long_pdf and long_pdf not in pdf_candidates:
         pdf_candidates.append(long_pdf)
 
     if pdf_candidates:
-        # raster-check the print PDF (first candidate); long-image is a single tall page,
-        # so the inter-page check is N/A there — note it.
+        # raster-check the A4 print PDF (first candidate); the long PDF is a single tall
+        # page, so the inter-page whitespace check is structurally N/A there — its content
+        # is already covered by the static checks on the shared src HTML.
         report["_pdf"] = pdf_candidates[0]
         check_a4_ragged_whitespace(report, results)
         for extra in pdf_candidates[1:]:
             results.append(Result("a4-ragged-whitespace", INFO,
-                                  "also present (single tall page, inter-page check N/A): {}"
+                                  "long PDF present ({}): single tall page — inter-page check N/A; "
+                                  "covered by the static checks on the same src HTML"
                                   .format(os.path.basename(extra))))
     else:
         check_a4_ragged_whitespace({}, results)  # emits the "no PDF" INFO
@@ -541,8 +558,12 @@ def main(argv):
     if not os.path.isfile(cfg_path):
         sys.stderr.write("config not found: {}\n".format(cfg_path))
         return 2
-    with open(cfg_path, "r", encoding="utf-8") as f:
-        cfg = json.load(f)
+    try:
+        with open(cfg_path, "r", encoding="utf-8") as f:
+            cfg = json.load(f)
+    except json.JSONDecodeError as e:
+        sys.stderr.write("config is not valid JSON: {} ({})\n".format(cfg_path, e))
+        return 2
     cfg_dir = os.path.dirname(os.path.abspath(cfg_path))
     reports = cfg.get("reports", [])
     if not reports:
