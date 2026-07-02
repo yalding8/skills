@@ -272,6 +272,12 @@ claude install-skill https://github.com/yalding8/skills/tree/main/tdd
 /sync-skills
 ```
 
+同步脚本在推送前自动执行凭证扫描门禁，检出疑似密钥即中止。
+
+## 维护记录
+
+- [AUDIT_2026-07-02_SKILLS_INVENTORY](./docs/AUDIT_2026-07-02_SKILLS_INVENTORY.md)
+
 ---
 
 <details>
