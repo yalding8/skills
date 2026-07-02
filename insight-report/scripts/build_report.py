@@ -47,7 +47,9 @@ Per-row keys:
     label       (str, required)   right-aligned text left of the bar
     value       (number)          the datum; drives math + default printed text
     value_text  (str, optional)   override the printed value cell (e.g. "+22%", "2.0万")
-    w           (number, optional) explicit data-w; required for mode raw_w
+    w           (number, optional) explicit data-w; required for mode raw_w. In scale/percent
+                                  modes it BYPASSES the math (a warning is printed) — never
+                                  hand-compute widths there; give raw values instead.
     hl          (bool, optional)  THE highlighted row — brand-colour fill (#FF5A5F),
                                   bold label. Use for the subject (Cardiff / UK). One per chart.
     up          (bool, optional)  growth-green fill (positive emphasis)
@@ -82,7 +84,7 @@ CONTENT JSON SHAPE  (see templates/content.example.json for an annotated copy)
   "topbar": { logo_src, logo_alt, issue (may contain <br>) },
   "hero": { kicker, h1 (may contain <br>/<span class=accent>), deck,
             meta: [ {b, span}, x4 ] },
-  "stats": [ {b, span, tone?} x4 ],   # tone: "pos"|"neg"|"neutral" override; default auto by +/− sign of b (unsigned keeps positional color)
+  "stats": [ {b, span, sub?, tone?, icon?} x4 ],   # tone: "pos"|"neg"|"neutral" override; default auto by +/− sign of b (unsigned → neutral ink; the old positional rainbow was removed 2026-06-18)
   "chapters": [
      { "num": "01", "h2": "...", "sub": "...",
        "blocks": [ <block>, ... ],
@@ -262,6 +264,12 @@ def is_negative(value, w):
     return False
 
 
+def _warn_explicit_w(mode, label):
+    sys.stderr.write("WARN: bar %r sets explicit 'w' in mode %r — this bypasses the width "
+                     "math; never hand-compute data-w (use mode 'raw_w' if a hand-tuned "
+                     "visual encoding is intended)\n" % (label, mode))
+
+
 def render_bars(chart):
     mode = chart.get("mode", "scale")
     scale = chart.get("scale", 95)
@@ -291,9 +299,12 @@ def render_bars(chart):
                 raise ValueError("mode raw_w requires 'w' on every bar (label=%r)" % label)
             w = float(explicit_w)
         elif mode == "percent":
+            if explicit_w is not None:
+                _warn_explicit_w(mode, label)
             w = float(explicit_w) if explicit_w is not None else float(value)
         else:  # scale
             if explicit_w is not None:
+                _warn_explicit_w(mode, label)
                 w = float(explicit_w)
             else:
                 v = float(value) if value is not None else 0.0
@@ -302,6 +313,9 @@ def render_bars(chart):
         zeroed = bool(neg or w < 0)
         if zeroed:
             w = 0.0
+        if w > 100:
+            sys.stderr.write("WARN: bar %r data-w=%s > 100 — will overflow its track "
+                             "(preflight FAILs on this)\n" % (label, fmt_w(w)))
 
         # printed value cell
         if value_text is not None:
@@ -661,6 +675,9 @@ STAT_ICONS = {
 
 
 def render_stat_cells(stats):
+    if len(stats) != 4:
+        sys.stderr.write("WARN: stats has %d cards (the strip is designed as a 4-column "
+                         "grid; other counts render but break the rhythm)\n" % len(stats))
     out = []
     for s in stats:
         b = s["b"]
@@ -725,8 +742,13 @@ def _img_data_uri(path):
 
 def _logo_img(cls, asset_path, alt, fallback_src):
     """Emit an <img>; embed the asset as a data URI when present (self-contained HTML),
-    else fall back to a relative src (which then MUST be shipped alongside the HTML)."""
+    else fall back to a relative src (which then MUST be shipped alongside the HTML).
+    The fallback is WARNED about — it silently un-self-contains the handoff otherwise."""
     uri = _img_data_uri(asset_path)
+    if uri is None:
+        sys.stderr.write("WARN: logo asset not found: %s — falling back to relative "
+                         "src=%r; the HTML is NOT self-contained (ship the file alongside, "
+                         "or fix the path)\n" % (asset_path, fallback_src))
     return '<img class="%s" src="%s" alt="%s">' % (cls, uri or fallback_src, alt)
 
 
@@ -795,11 +817,23 @@ def main():
     ap.add_argument("-o", "--output", help="output HTML path (default: JSON's 'output' key)")
     args = ap.parse_args()
 
-    with open(args.content, "r", encoding="utf-8") as f:
-        content = json.load(f)
+    try:
+        with open(args.content, "r", encoding="utf-8") as f:
+            content = json.load(f)
+    except FileNotFoundError:
+        print("ERROR: content JSON not found: %s" % args.content, file=sys.stderr)
+        sys.exit(1)
+    except json.JSONDecodeError as e:
+        print("ERROR: content is not valid JSON: %s (%s)" % (args.content, e), file=sys.stderr)
+        sys.exit(1)
 
     json_dir = os.path.dirname(os.path.abspath(args.content))
-    html = build(content, json_dir)
+    try:
+        html = build(content, json_dir)
+    except KeyError as e:
+        print("ERROR: content JSON is missing required key %s — see "
+              "templates/content.example.json for the full shape" % e, file=sys.stderr)
+        sys.exit(1)
 
     out = args.output or content.get("output")
     if not out:
