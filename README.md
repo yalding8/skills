@@ -1,6 +1,6 @@
 # Agent Skills
 
-个人 AI 技能合集，适用于 Claude Code、Cursor 等 AI 编码助手。88 个技能，9 大分类。
+个人 AI 技能合集，适用于 Claude Code、Cursor 等 AI 编码助手。151 个技能，14 大分类。
 
 > 从 `~/.claude/` 自动同步 · [English version](#english-version)
 
@@ -30,6 +30,7 @@
 | [improve-architecture](./improve-architecture) | 发现架构改进机会，通过深化浅模块提升可测试性 |
 | [request-refactor](./request-refactor) | 通过用户访谈创建小步提交的重构方案，提交为 GitHub Issue |
 | [migrate-to-shoehorn](./migrate-to-shoehorn) | 将测试文件的 as 类型断言迁移为 @total-typescript/shoehorn |
+| [miniprogram-development](./miniprogram-development) | 微信小程序开发 — 构建、调试、预览、发布、云开发 |
 
 ## 工具与效率
 
@@ -46,6 +47,11 @@
 | [obsidian-vault](./obsidian-vault) | 搜索、创建和管理 Obsidian 笔记 |
 | [ljg-skill-map](./ljg-skill-map) | 技能地图 — 扫描已安装技能渲染 ASCII 总览 |
 | [ljg-x-download](./ljg-x-download) | X/Twitter 媒体下载到本地 |
+| [born-traceable](./born-traceable) | 新项目/定时任务出生即可溯源 — 产物盖戳 + 触发进 git + 死人开关 |
+| [update-readme](./update-readme) | 扫描 git 历史更新 README，保持现有格式 |
+| [publish-artifact](./publish-artifact) | 发布 HTML/附件/目录到私有 IPFS Cluster，返回不可变分享链接 |
+| [kubo-deploy-e2e](./kubo-deploy-e2e) | 私有 IPFS Cluster（Kubo）部署链路端到端测试 — 单机 3 节点 compose |
+| [kubo-publish-e2e](./kubo-publish-e2e) | Agent 发布链路端到端测试 — 经 token 写入口发布 HTML 到 IPFS Cluster |
 
 ## 前端设计 — Impeccable
 
@@ -75,6 +81,31 @@
 | [onboard](./onboard) | 设计引导流程和空状态 |
 | [overdrive](./overdrive) | 突破常规限制的技术炫技效果 |
 
+## 前端工程
+
+移动端、响应式与性能。
+
+| 技能 | 说明 |
+|------|------|
+| [mobile-design](./mobile-design) | 移动端 UX 模式、触控交互、手势设计与移动优先原则 |
+| [responsive-design](./responsive-design) | 移动优先响应式设计 — 流式布局、媒体查询、flexbox/grid |
+| [web-perf](./web-perf) | 用 Chrome DevTools 分析 Web 性能，度量 Core Web Vitals |
+| [platform-check](./platform-check) | 防止 AI 重复实现平台原生能力 — 改 UI 前三道门禁 |
+
+## Cloudflare 开发
+
+Workers 生态：部署、状态、沙箱、Agent、邮件。
+
+| 技能 | 说明 |
+|------|------|
+| [cloudflare](./cloudflare) | Cloudflare 开发总纲 — Workers、Pages、R2、KV 等产品选型与集成 |
+| [wrangler](./wrangler) | Wrangler CLI — Cloudflare Workers 项目配置与部署 |
+| [workers-best-practices](./workers-best-practices) | Cloudflare Workers 最佳实践 |
+| [durable-objects](./durable-objects) | Durable Objects — 有状态协调、RPC、SQLite、告警、WebSocket |
+| [agents-sdk](./agents-sdk) | 用 Agents SDK 在 Cloudflare Workers 上构建 AI Agent |
+| [sandbox-sdk](./sandbox-sdk) | Sandbox SDK — 安全沙箱代码执行、代码解释器、CI/CD |
+| [cloudflare-email-service](./cloudflare-email-service) | Cloudflare Email Service 收发事务邮件 |
+
 ## 认知与写作
 
 思维工具和写作引擎。部分来自 [ljg-skills](https://github.com/lijigang/ljg-skills)。
@@ -102,6 +133,8 @@
 | [ljg-paper-flow](./ljg-paper-flow) | 论文流 — 读论文 → 铸卡片一气呵成 |
 | [ljg-word-flow](./ljg-word-flow) | 词卡流 — 解词 → 铸信息图一气呵成 |
 | [ljg-travel](./ljg-travel) | 旅行研究 — 城市文化 DBA + 便携参考卡片 |
+| [guizang-social-card-skill](./guizang-social-card-skill) | 归藏风格社交卡片 — 小红书图文套图 + 公众号封面对 |
+| [guizang-ppt-skill](./guizang-ppt-skill) | 归藏风格 PPT/幻灯片生成 |
 
 ## 营销与增长
 
@@ -125,6 +158,8 @@
 | [free-tool-strategy](./free-tool-strategy) | 规划免费工具用于获客和 SEO |
 | [competitor-alternatives](./competitor-alternatives) | 创建竞品对比页和替代方案页 |
 | [sales-enablement](./sales-enablement) | 销售物料：pitch deck、话术、异议处理 |
+| [baoyu-markdown-to-html](./baoyu-markdown-to-html) | Markdown 转微信公众号友好 HTML |
+| [baoyu-post-to-wechat](./baoyu-post-to-wechat) | 发布文章/贴图到微信公众号（API 或 Chrome CDP） |
 
 ## SEO 与搜索
 
@@ -155,6 +190,69 @@
 | [referral-program](./referral-program) | 设计推荐计划和口碑增长 |
 | [revops](./revops) | 收入运营、线索生命周期和市场-销售衔接 |
 
+## 飞书 Lark
+
+飞书开放平台全家桶：文档、表格、消息、日历、审批、知识库。
+
+| 技能 | 说明 |
+|------|------|
+| [lark-base](./lark-base) | 飞书多维表格 — 建表、字段、记录、视图、公式、仪表盘、权限 |
+| [lark-doc](./lark-doc) | 飞书云文档 — 读取、创建、编辑 Docx/Wiki 文档 |
+| [lark-sheets](./lark-sheets) | 飞书电子表格 — 单元格读写、公式、图表、透视表、批量更新 |
+| [lark-drive](./lark-drive) | 飞书云空间 — 上传下载、目录管理、格式导入 |
+| [lark-wiki](./lark-wiki) | 飞书知识库 — 空间、节点、成员管理 |
+| [lark-im](./lark-im) | 飞书即时通讯 — 收发消息、群管理、文件、加急 |
+| [lark-mail](./lark-mail) | 飞书邮箱 — 邮件收发与管理 |
+| [lark-calendar](./lark-calendar) | 飞书日历 — 日程、忙闲查询、会议室预定 |
+| [lark-task](./lark-task) | 飞书任务 — 待办创建与管理 |
+| [lark-contact](./lark-contact) | 飞书通讯录 — 姓名/邮箱与 open_id 互查 |
+| [lark-approval](./lark-approval) | 飞书审批流程查询与操作 |
+| [lark-attendance](./lark-attendance) | 飞书考勤 — 打卡记录与假勤管理 |
+| [lark-okr](./lark-okr) | 飞书 OKR 查询与管理 |
+| [lark-minutes](./lark-minutes) | 飞书妙记 — 会议纪要查询与导出 |
+| [lark-note](./lark-note) | 飞书小记管理 |
+| [lark-vc](./lark-vc) | 飞书视频会议 — 会议记录查询 |
+| [lark-vc-agent](./lark-vc-agent) | 飞书视频会议 Agent 工作流 |
+| [lark-whiteboard](./lark-whiteboard) | 飞书画板读取与操作 |
+| [lark-slides](./lark-slides) | 飞书幻灯片创建与编辑 |
+| [lark-markdown](./lark-markdown) | 飞书 Markdown 文件 — 查看、创建、编辑、patch、diff |
+| [lark-event](./lark-event) | 飞书事件订阅管理 |
+| [lark-apps](./lark-apps) | 妙搭（Miaoda/Spark）应用开发与托管 — HTML 发布、本地/云端全栈开发 |
+| [lark-shared](./lark-shared) | lark-* skills 共享认证与工具库 |
+| [lark-openapi-explorer](./lark-openapi-explorer) | 从官方文档挖掘未封装的飞书原生 OpenAPI |
+| [lark-skill-maker](./lark-skill-maker) | 脚手架生成新的 lark-* skill |
+| [lark-workflow-meeting-summary](./lark-workflow-meeting-summary) | 工作流：会议纪要自动生成 |
+| [lark-workflow-standup-report](./lark-workflow-standup-report) | 工作流：站会日报自动生成 |
+| [feishu-wiki](./feishu-wiki) | 本地 Markdown 推送到飞书知识库并转 Docs 格式 |
+
+## 企业微信 WeCom
+
+基于 wecom-cli 的企业微信操作。
+
+| 技能 | 说明 |
+|------|------|
+| [wecomcli-get-msg](./wecomcli-get-msg) | 企微：读取消息 |
+| [wecomcli-lookup-contact](./wecomcli-lookup-contact) | 企微：查找联系人 |
+| [wecomcli-create-meeting](./wecomcli-create-meeting) | 企微：创建会议 |
+| [wecomcli-edit-meeting](./wecomcli-edit-meeting) | 企微：修改会议 |
+| [wecomcli-get-meeting](./wecomcli-get-meeting) | 企微：查询会议 |
+| [wecomcli-get-todo-list](./wecomcli-get-todo-list) | 企微：待办列表 |
+| [wecomcli-get-todo-detail](./wecomcli-get-todo-detail) | 企微：待办详情 |
+| [wecomcli-edit-todo](./wecomcli-edit-todo) | 企微：编辑待办 |
+| [wecomcli-manage-doc](./wecomcli-manage-doc) | 企微：文档管理 |
+| [wecomcli-manage-schedule](./wecomcli-manage-schedule) | 企微：日程管理 |
+| [wecomcli-manage-smartsheet-data](./wecomcli-manage-smartsheet-data) | 企微：智能表格数据操作 |
+| [wecomcli-manage-smartsheet-schema](./wecomcli-manage-smartsheet-schema) | 企微：智能表格结构管理 |
+
+## 业务工作流
+
+特定业务场景的端到端流程。
+
+| 技能 | 说明 |
+|------|------|
+| [insight-report](./insight-report) | uhomes 市场调研/渠道洞察报告全流程 — 问卷、分析、双语 HTML、水印 PDF |
+| [interview-copilot](./interview-copilot) | 终面副驾 — 简历评估、定制问题、现场记录、录用决策与存档 |
+
 ---
 
 ## 安装
@@ -179,7 +277,7 @@ claude install-skill https://github.com/yalding8/skills/tree/main/tdd
 <details>
 <summary><h2 id="english-version">English Version</h2></summary>
 
-A personal collection of 88 agent skills for Claude Code, Cursor, and other AI coding tools.
+A personal collection of agent skills for Claude Code, Cursor, and other AI coding tools.
 
 > Auto-synced from `~/.claude/`.
 
@@ -201,6 +299,7 @@ A personal collection of 88 agent skills for Claude Code, Cursor, and other AI c
 | [improve-architecture](./improve-architecture) | Find architectural improvements by deepening shallow modules |
 | [request-refactor](./request-refactor) | Create a detailed refactor plan with tiny commits via user interview |
 | [migrate-to-shoehorn](./migrate-to-shoehorn) | Migrate test files from `as` assertions to @total-typescript/shoehorn |
+| [miniprogram-development](./miniprogram-development) | WeChat Mini Program development — build, debug, preview, publish, CloudBase |
 
 ### Tooling & Productivity
 | Skill | Description |
@@ -214,6 +313,11 @@ A personal collection of 88 agent skills for Claude Code, Cursor, and other AI c
 | [obsidian-vault](./obsidian-vault) | Search, create, and manage notes in Obsidian vault |
 | [ljg-skill-map](./ljg-skill-map) | Scan installed skills and render ASCII visual overview |
 | [ljg-x-download](./ljg-x-download) | Download images and videos from X/Twitter posts |
+| [born-traceable](./born-traceable) | Make new projects and scheduled jobs traceable from birth — stamps, git triggers, dead-man switches |
+| [update-readme](./update-readme) | Update README.md from recent code changes, keeping existing format |
+| [publish-artifact](./publish-artifact) | Publish HTML, attachments, or directories to a private IPFS Cluster for immutable share links |
+| [kubo-deploy-e2e](./kubo-deploy-e2e) | E2E test/demo for private IPFS Cluster (Kubo) deployment — 3-node docker-compose |
+| [kubo-publish-e2e](./kubo-publish-e2e) | E2E test/demo for the agent publish pipeline to a private IPFS Cluster |
 
 ### Frontend Design — Impeccable
 From [Impeccable](https://github.com/pbakaus/impeccable) — design vocabulary for AI-assisted frontend development.
@@ -242,6 +346,25 @@ From [Impeccable](https://github.com/pbakaus/impeccable) — design vocabulary f
 | [onboard](./onboard) | Design onboarding flows and empty states |
 | [overdrive](./overdrive) | Push past conventional limits with ambitious implementations |
 
+### Frontend Engineering
+| Skill | Description |
+|-------|-------------|
+| [mobile-design](./mobile-design) | Mobile UX patterns, touch interactions, gestures, mobile-first principles |
+| [responsive-design](./responsive-design) | Mobile-first responsive design — fluid layouts, media queries, flexbox, grid |
+| [web-perf](./web-perf) | Analyze web performance via Chrome DevTools MCP, measure Core Web Vitals |
+| [platform-check](./platform-check) | Prevent AI from reimplementing platform-native capabilities — three gates before UI changes |
+
+### Cloudflare Development
+| Skill | Description |
+|-------|-------------|
+| [cloudflare](./cloudflare) | Cloudflare development overview — Workers, Pages, R2, KV, product selection |
+| [wrangler](./wrangler) | Wrangler CLI for Cloudflare Workers configuration and deployment |
+| [workers-best-practices](./workers-best-practices) | Cloudflare Workers best practices |
+| [durable-objects](./durable-objects) | Durable Objects — stateful coordination, RPC, SQLite, alarms, WebSockets |
+| [agents-sdk](./agents-sdk) | Build AI agents on Cloudflare Workers with the Agents SDK |
+| [sandbox-sdk](./sandbox-sdk) | Sandbox SDK — secure sandboxed code execution, interpreters, CI/CD |
+| [cloudflare-email-service](./cloudflare-email-service) | Send and receive transactional email with Cloudflare Email Service |
+
 ### Cognition & Writing
 Thinking tools and writing engines. Partially from [ljg-skills](https://github.com/lijigang/ljg-skills).
 
@@ -267,6 +390,8 @@ Cast content into shareable visual artifacts. From [ljg-skills](https://github.c
 | [ljg-paper-flow](./ljg-paper-flow) | Paper workflow: read paper → cast card in one go |
 | [ljg-word-flow](./ljg-word-flow) | Word flow: deep-dive analysis → infograph card in one go |
 | [ljg-travel](./ljg-travel) | Deep travel research with org-mode docs + portable reference cards |
+| [guizang-social-card-skill](./guizang-social-card-skill) | Guizang-style social card sets and WeChat official account cover pairs |
+| [guizang-ppt-skill](./guizang-ppt-skill) | Guizang-style presentation deck generation |
 
 ### Marketing & Growth
 | Skill | Description |
@@ -287,6 +412,8 @@ Cast content into shareable visual artifacts. From [ljg-skills](https://github.c
 | [free-tool-strategy](./free-tool-strategy) | Plan free tools for lead gen and SEO value |
 | [competitor-alternatives](./competitor-alternatives) | Create competitor comparison and alternative pages |
 | [sales-enablement](./sales-enablement) | Sales collateral: pitch decks, talk tracks, objection handling |
+| [baoyu-markdown-to-html](./baoyu-markdown-to-html) | Convert Markdown to WeChat-friendly HTML |
+| [baoyu-post-to-wechat](./baoyu-post-to-wechat) | Post articles and image-text to WeChat Official Account (API or Chrome CDP) |
 
 ### SEO
 | Skill | Description |
@@ -312,6 +439,60 @@ Cast content into shareable visual artifacts. From [ljg-skills](https://github.c
 | [churn-prevention](./churn-prevention) | Churn prevention, cancellation flows, and save offers |
 | [referral-program](./referral-program) | Design referral programs and word-of-mouth growth |
 | [revops](./revops) | Revenue operations, lead lifecycle, marketing-sales handoff |
+
+### Feishu Lark
+| Skill | Description |
+|-------|-------------|
+| [lark-base](./lark-base) | Feishu Base (bitable) — tables, fields, records, views, formulas, dashboards |
+| [lark-doc](./lark-doc) | Feishu Docs — read, create, edit cloud documents |
+| [lark-sheets](./lark-sheets) | Feishu Sheets — cells, formulas, charts, pivot tables, batch updates |
+| [lark-drive](./lark-drive) | Feishu Drive — upload/download, folders, file import |
+| [lark-wiki](./lark-wiki) | Feishu Wiki — spaces, nodes, member management |
+| [lark-im](./lark-im) | Feishu IM — messages, groups, files, urgent pings |
+| [lark-mail](./lark-mail) | Feishu Mail — send and manage email |
+| [lark-calendar](./lark-calendar) | Feishu Calendar — events, free/busy, meeting rooms |
+| [lark-task](./lark-task) | Feishu Tasks — create and manage todos |
+| [lark-contact](./lark-contact) | Feishu contacts — resolve names/emails to open_id and back |
+| [lark-approval](./lark-approval) | Feishu approval workflows |
+| [lark-attendance](./lark-attendance) | Feishu attendance records and leave management |
+| [lark-okr](./lark-okr) | Feishu OKR queries and management |
+| [lark-minutes](./lark-minutes) | Feishu Minutes — meeting transcripts |
+| [lark-note](./lark-note) | Feishu notes management |
+| [lark-vc](./lark-vc) | Feishu video conferencing records |
+| [lark-vc-agent](./lark-vc-agent) | Feishu VC agent workflows |
+| [lark-whiteboard](./lark-whiteboard) | Feishu Whiteboard reading and operations |
+| [lark-slides](./lark-slides) | Feishu Slides creation and editing |
+| [lark-markdown](./lark-markdown) | Feishu Markdown files — view, create, edit, patch, diff |
+| [lark-event](./lark-event) | Feishu event subscriptions |
+| [lark-apps](./lark-apps) | Miaoda (Spark) app development and hosting — HTML publishing, local/cloud full-stack dev |
+| [lark-shared](./lark-shared) | Shared auth and utilities for lark-* skills |
+| [lark-openapi-explorer](./lark-openapi-explorer) | Explore native Feishu OpenAPIs beyond the CLI wrappers |
+| [lark-skill-maker](./lark-skill-maker) | Scaffold new lark-* skills |
+| [lark-workflow-meeting-summary](./lark-workflow-meeting-summary) | Workflow: automated meeting summaries |
+| [lark-workflow-standup-report](./lark-workflow-standup-report) | Workflow: automated standup reports |
+| [feishu-wiki](./feishu-wiki) | Push local Markdown to Feishu Wiki as native Docs |
+
+### WeCom
+| Skill | Description |
+|-------|-------------|
+| [wecomcli-get-msg](./wecomcli-get-msg) | WeCom: read messages |
+| [wecomcli-lookup-contact](./wecomcli-lookup-contact) | WeCom: look up contacts |
+| [wecomcli-create-meeting](./wecomcli-create-meeting) | WeCom: create meetings |
+| [wecomcli-edit-meeting](./wecomcli-edit-meeting) | WeCom: edit meetings |
+| [wecomcli-get-meeting](./wecomcli-get-meeting) | WeCom: get meeting info |
+| [wecomcli-get-todo-list](./wecomcli-get-todo-list) | WeCom: list todos |
+| [wecomcli-get-todo-detail](./wecomcli-get-todo-detail) | WeCom: todo details |
+| [wecomcli-edit-todo](./wecomcli-edit-todo) | WeCom: edit todos |
+| [wecomcli-manage-doc](./wecomcli-manage-doc) | WeCom: manage docs |
+| [wecomcli-manage-schedule](./wecomcli-manage-schedule) | WeCom: manage schedules |
+| [wecomcli-manage-smartsheet-data](./wecomcli-manage-smartsheet-data) | WeCom: smartsheet data operations |
+| [wecomcli-manage-smartsheet-schema](./wecomcli-manage-smartsheet-schema) | WeCom: smartsheet schema management |
+
+### Business Workflows
+| Skill | Description |
+|-------|-------------|
+| [insight-report](./insight-report) | End-to-end uhomes market-research insight reports with watermarked PDF export |
+| [interview-copilot](./interview-copilot) | Final-round interview copilot — resume evaluation, custom questions, hire decisions |
 
 ### Install
 ```bash
