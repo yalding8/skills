@@ -119,9 +119,11 @@ TEMPLATE_PATH = os.path.join(HERE, "..", "templates", "report.template.html")
 # ----------------------------------------------------------------------------------------
 PRESET_CN = {
     "font_face": (
-        "@font-face{font-family:'Alibaba PuHuiTi 3.0';src:url('https://puhuiti.oss-cn-hangzhou.aliyuncs.com/AlibabaPuHuiTi-3/AlibabaPuHuiTi_3_55_Regular/AlibabaPuHuiTi_3_55_Regular.woff2') format('woff2');font-weight:400;font-display:swap}\n"
-        "@font-face{font-family:'Alibaba PuHuiTi 3.0';src:url('https://puhuiti.oss-cn-hangzhou.aliyuncs.com/AlibabaPuHuiTi-3/AlibabaPuHuiTi_3_85_Bold/AlibabaPuHuiTi_3_85_Bold.woff2') format('woff2');font-weight:700;font-display:swap}\n"
-        "@font-face{font-family:'Alibaba PuHuiTi 3.0';src:url('https://puhuiti.oss-cn-hangzhou.aliyuncs.com/AlibabaPuHuiTi-3/AlibabaPuHuiTi_3_65_Medium/AlibabaPuHuiTi_3_65_Medium.woff2') format('woff2');font-weight:500;font-display:swap}"
+        # local() first: the public PuHuiTi OSS bucket started returning 403 (2026-07), so
+        # machines with the font installed must not depend on the CDN.
+        "@font-face{font-family:'Alibaba PuHuiTi 3.0';src:local('AlibabaPuHuiTi-Regular'),local('Alibaba PuHuiTi'),url('https://puhuiti.oss-cn-hangzhou.aliyuncs.com/AlibabaPuHuiTi-3/AlibabaPuHuiTi_3_55_Regular/AlibabaPuHuiTi_3_55_Regular.woff2') format('woff2');font-weight:400;font-display:swap}\n"
+        "@font-face{font-family:'Alibaba PuHuiTi 3.0';src:local('AlibabaPuHuiTi-Bold'),url('https://puhuiti.oss-cn-hangzhou.aliyuncs.com/AlibabaPuHuiTi-3/AlibabaPuHuiTi_3_85_Bold/AlibabaPuHuiTi_3_85_Bold.woff2') format('woff2');font-weight:700;font-display:swap}\n"
+        "@font-face{font-family:'Alibaba PuHuiTi 3.0';src:local('AlibabaPuHuiTiM'),local('Alibaba PuHuiTi M'),url('https://puhuiti.oss-cn-hangzhou.aliyuncs.com/AlibabaPuHuiTi-3/AlibabaPuHuiTi_3_65_Medium/AlibabaPuHuiTi_3_65_Medium.woff2') format('woff2');font-weight:500;font-display:swap}"
     ),
     "montserrat_import": "https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,800;1,400&display=swap",
     "font_body": "'Alibaba PuHuiTi 3.0','PingFang SC','Microsoft YaHei',sans-serif",
@@ -176,8 +178,10 @@ PRESET_CN = {
 
 PRESET_EN = {
     "font_face": (
-        "@font-face{font-family:'Alibaba PuHuiTi 3.0';src:url('https://puhuiti.oss-cn-hangzhou.aliyuncs.com/AlibabaPuHuiTi-3/AlibabaPuHuiTi_3_55_Regular/AlibabaPuHuiTi_3_55_Regular.woff2') format('woff2');font-weight:400;font-display:swap}\n"
-        "@font-face{font-family:'Alibaba PuHuiTi 3.0';src:url('https://puhuiti.oss-cn-hangzhou.aliyuncs.com/AlibabaPuHuiTi-3/AlibabaPuHuiTi_3_85_Bold/AlibabaPuHuiTi_3_85_Bold.woff2') format('woff2');font-weight:700;font-display:swap}"
+        # local() first: the public PuHuiTi OSS bucket started returning 403 (2026-07), so
+        # machines with the font installed must not depend on the CDN.
+        "@font-face{font-family:'Alibaba PuHuiTi 3.0';src:local('AlibabaPuHuiTi-Regular'),local('Alibaba PuHuiTi'),url('https://puhuiti.oss-cn-hangzhou.aliyuncs.com/AlibabaPuHuiTi-3/AlibabaPuHuiTi_3_55_Regular/AlibabaPuHuiTi_3_55_Regular.woff2') format('woff2');font-weight:400;font-display:swap}\n"
+        "@font-face{font-family:'Alibaba PuHuiTi 3.0';src:local('AlibabaPuHuiTi-Bold'),url('https://puhuiti.oss-cn-hangzhou.aliyuncs.com/AlibabaPuHuiTi-3/AlibabaPuHuiTi_3_85_Bold/AlibabaPuHuiTi_3_85_Bold.woff2') format('woff2');font-weight:700;font-display:swap}"
     ),
     "montserrat_import": "https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,800;1,400&display=swap",
     "font_body": "'Montserrat','Helvetica Neue',Arial,sans-serif",
